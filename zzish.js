@@ -375,6 +375,11 @@
 /**** PROXY STUFF TO SEND DATA ***/
 /*** REQUEST has 3 attributes (method, url and data) ****/
 
+if (typeof window === 'undefined') {
+  // we running in node so use https://www.npmjs.org/package/xmlhttprequest
+  XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
+}
+
 function sendData(request, callback) {    
     if (typeof request.method === 'undefined') {
         request.method = "POST";
