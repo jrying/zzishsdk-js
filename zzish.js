@@ -23,8 +23,8 @@
     var logEnabled = true;
 
 
-    //var baseUrl = "http://localhost:3000/zzishapi/api/";
     var header = "X-ApplicationId";
+    //var baseUrl = "http://localhost:8080/zzishapi/api/";
     var baseUrl = "http://api.zzish.co.uk/api/";
 
     /**
@@ -327,14 +327,13 @@
      */
     Zzish.getContent = function(profileId,uuid,callback){
       var request = {
-          method: "POST",
-          url: baseUrl + "profiles/"+profileId+"/contents/"+uuid,
-          data: content
+          method: "GET",
+          url: baseUrl + "profiles/"+profileId+"/contents/"+uuid
       }
       sendData(request,function(err,data) {
         callCallBack(err,data,function(status,message) {
           if (status==200) {
-            callback(200,data.payload);  
+            callback(200,data.payload.payload);  
           }          
           else {
             callback(status,message);
@@ -350,9 +349,8 @@
      */
     Zzish.listContent = function(profileId,callback){
       var request = {
-          method: "POST",
-          url: baseUrl + "profiles/"+profileId+"/contents",
-          data: content
+          method: "GET",
+          url: baseUrl + "profiles/"+profileId+"/contents"
       }
       sendData(request,function(err,data) {
         callCallBack(err,data,function(status,message) {

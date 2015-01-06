@@ -7,7 +7,7 @@
     <title>Zzish Quick Javascript Client SDK</title>
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
-    <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
 
     <script src="zzish.js"></script>
     <script>
@@ -50,7 +50,7 @@
         function getContent() {
             if (init) {                        
                 Zzish.getContent(userId,$("#gcid").val(),function(status,message) {
-                    $("#getContentOutput").html(message);
+                    $("#getContentOutput").html(JSON.stringify(message));
                 });
             }
             else {
@@ -61,7 +61,7 @@
         function listContent() {
             if (init) {     
                 Zzish.listContent(userId,function(status,message) {
-                    $("#listContentOutput").html(message);
+                    $("#listContentOutput").html(JSON.stringify(message));
                 });
             }
             else {
