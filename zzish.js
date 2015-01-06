@@ -64,9 +64,7 @@
             data: message
         }        
         sendData(request,function(err,data) {
-          if (!err) {
-            if (callback!=undefined) callback(data.status,data.message)
-          }
+          callCallBack(err,data,callback);
         })        
         return userId;
     };
@@ -196,9 +194,7 @@
             data: message
         }
         sendData(request,function(err,data) {
-            if (!err) {
-                callback(data.status,data.message)
-            }
+          callCallBack(err,data,callback);
         })
     };    
 
@@ -265,8 +261,118 @@
       */
     function replaceAll(find, replace, str) {
       return str.replace(new RegExp(find, 'g'), replace);
-    }    
+    } 
 
+    /**
+      * Helper method to call callback 
+      * err - error response from making call
+      * data - response from making call
+      * callback - callback method
+      */
+    function callCallBack(err,data,callback) {
+      //check if callback exists
+      if (callback!=undefined) {        
+        if (err!=undefined) {
+          //an error has ocurred when trying to get response
+          callback(err.status,err.message);
+        }
+        else if (data!=undefined) {
+          //check if api returns 200
+          if (data.status==200) {
+            //return payload as message will be null
+            callback(data.status,data.payload);  
+          }
+          else {
+            //return message
+            callback(data.status,data.message);
+          }
+        }
+        else {
+          callback(400,"Zzish error");
+        }
+      }
+    }
+
+
+    /**** CONTENT STUFF TO SEND DATA ***/
+
+    /**
+     * Save a Zzish content object
+     * @param id - The id of the profile to which to save the content for
+     * @param name - The id of the profile to which to save the content for
+     * @param content - The JSON object to save
+     * @param callback - An optional callback to call when done (returns error,message)
+     */
+    Zzish.postContent = function(profileId,id,name,content,callback){
+      var data = {
+        uuid: id,
+        name: name,
+        payload: JSON.stringify(content)
+      }
+      var request = {
+          method: "POST",
+          url: baseUrl + "profiles/"+profileId+"/contents",
+          data: data
+      }
+      sendData(request,function(err,data) {
+        callCallBack(err,data,callback);
+      });
+    }
+
+    /**
+     * Get a Zzish content object
+     * @param profileId - The id of the profile to which to get the content for
+     * @param content - The Zzish content (JSON)    
+     * @param callback - An callback to call when done (returns error AND (message or data))
+     */
+    Zzish.getContent = function(profileId,uuid,callback){
+      var request = {
+          method: "POST",
+          url: baseUrl + "profiles/"+profileId+"/contents/"+uuid,
+          data: content
+      }
+      sendData(request,function(err,data) {
+        callCallBack(err,data,function(status,message) {
+          if (status==200) {
+            callback(200,data.payload);  
+          }          
+          else {
+            callback(status,message);
+          }
+        });
+      });      
+    }
+
+    /**
+     * Get a list of Zzish content object
+     * @param profileId - The id of the profile to which to get contents for
+     * @param callback - An callback to call when done (returns error AND (message or list of uuid,name))
+     */
+    Zzish.listContent = function(profileId,callback){
+      var request = {
+          method: "POST",
+          url: baseUrl + "profiles/"+profileId+"/contents",
+          data: content
+      }
+      sendData(request,function(err,data) {
+        callCallBack(err,data,function(status,message) {
+          if (status==200) {
+            var list = [];
+            for (i in data.payload) {
+              var result = {
+               uuid: data.payload[i].uuid, 
+               name: data.payload[i].name,
+              }
+              list.push(result);
+            }
+            callback(200,list);
+          }
+          else {
+            callback(status,message);
+          }
+        });
+      });  
+    }
 
 /**** PROXY STUFF TO SEND DATA ***/
 /*** REQUEST has 3 attributes (method, url and data) ****/
