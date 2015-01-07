@@ -21,8 +21,8 @@
 
     var header = "X-ApplicationId";    
     //var header = "Authorization";
-    var baseUrl = "http://localhost:8080/zzishapi/api/";
-    //var baseUrl = "http://api.zzish.co.uk/api/";
+    //var baseUrl = "http://localhost:8080/zzishapi/api/";
+    var baseUrl = "http://api.zzish.co.uk/api/";
     var headerprefix = "";    
     //var headerprefix = "Bearer ";
     
