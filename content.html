@@ -22,8 +22,8 @@
 
         function createUser() {
             if (init) {
-                userId = Zzish.getUser($("#userId").val(),$("#name").val(),function(status,message) {
-                    console.log("User created with status" + status);    
+                userId = Zzish.getUser($("#userId").val(),$("#name").val(),function(err,message) {
+                    console.log("User created with status" + err);    
                 });
                 
             }
@@ -36,8 +36,8 @@
             if (init) {            
                 //postContent = function(profileId,id,name,content,callback)
                 var JSON_val = JSON.parse($("#cjson").val());
-                Zzish.postContent(userId,$("#cid").val(),$("#cname").val(),JSON_val,function(status,message) {
-                    console.log("Content created with status" + status);    
+                Zzish.postContent(userId,$("#cid").val(),$("#cname").val(),JSON_val,function(err,message) {
+                    console.log("Content created with status" + err);    
                 });
             }
             else {
@@ -48,7 +48,7 @@
 
         function getContent() {
             if (init) {                        
-                Zzish.getContent(userId,$("#gcid").val(),function(status,message) {
+                Zzish.getContent(userId,$("#gcid").val(),function(err,message) {
                     $("#getContentOutput").html(JSON.stringify(message));
                 });
             }
@@ -59,7 +59,7 @@
 
         function listContent() {
             if (init) {     
-                Zzish.listContent(userId,function(status,message) {
+                Zzish.listContent(userId,function(err,message) {
                     $("#listContentOutput").html(JSON.stringify(message));
                 });
             }
@@ -70,7 +70,7 @@
 
         function publishContentToGroup() {
             if (init) {     
-                Zzish.publishContent(userId,$("#pemail").val(),$("#pid").val(),$("#pcode").val(),function(status,message) {
+                Zzish.publishContent(userId,$("#pemail").val(),$("#pid").val(),$("#pcode").val(),function(err,message) {
                     $("#publishContentOutput").html(JSON.stringify(message));
                 });
             }

@@ -10,21 +10,23 @@
     //tracks this device
     var deviceId;
     //tracks a session (resets when a new user is selected)
-    var sessionId
-    //the app Id (sandbox or production) generated from developer consoler (https://developer.zzish.com)
+    var sessionId;
+    //the app Id (sandbox or production) generated from developer console (https://developer.zzish.com)
     var appId;
-    //keep track of the current user (so we know when session needs to be udpated)
+    //keep track of the current user (so we know when session needs to be updated)
     var currentUser = null;
-
 
 
 /**** CONFIGURATION ******/
 
-    var header = "X-ApplicationId";
-    var headerprefix = "";
-    //var baseUrl = "http://localhost:8080/zzishapi/api/";
+    var header = "X-ApplicationId";    
+    //var header = "Authorization";
+    var baseUrl = "http://localhost:8080/zzishapi/api/";
+    //var baseUrl = "http://api.zzish.co.uk/api/";
+    var headerprefix = "";    
     //var headerprefix = "Bearer ";
-    var baseUrl = "http://api.zzish.co.uk/api/";
+    
+    
     //logEnabled
     var logEnabled = true;
 
@@ -38,7 +40,7 @@
             if (deviceId == null) {
                 deviceId = v4();
                 localStorage.setItem("deviceId", deviceId);
-            }            
+            }
         }
         appId = applicationId;
     };
@@ -54,12 +56,18 @@
      * @return The user Id (returns the same id provided or a generated one)
      */
     Zzish.getUser = function (id, name, callback) {
+        if (id==undefined) id = v4();
         if (currentUser==undefined || currentUser.id != id) {
             sessionId = v4();
-            createUser(id,name,callback);
+            Zzish.createUser(id,name,function(err,message) {
+                if (!err) {
+                    currentUser = message;
+                }
+                callback(err,currentUser);
+            });
         }
         else {
-            callCallBack(null, {status: 200, payload: currentUser}, callback);
+            callCallBack(null, currentUser, callback);
         }
     };
 
@@ -70,7 +78,7 @@
      * @param name - The name of the activity (required)
      * @param code - The Zzish Class Code when creating a class in the learning hub (optional)
      * @param callback - A callback to be called after message is sent (returns error,message)
-     * @return The activity uuid
+     * @return The activity zzish
      */
     Zzish.startActivity = function (userId, name, code, callback) {
         aid = v4();
@@ -79,7 +87,7 @@
             activityName: name,
             activityUuid: aid,
             classCode: code
-        }, callback)
+        }, callback);
         return aid;
     };
 
@@ -131,7 +139,7 @@
             definition: {
                 type: name
             }
-        }
+        };
         if (response != undefined) {
             action["response"] = response;
         }
@@ -158,6 +166,67 @@
         }, callback);
     };
 
+
+    /**
+     * Register a User with a class using group Code and return list of contents ("contents") and the zzish studen code ("code")
+     *
+     * @param profileId - The Profile Id
+     * @param code - The Zzish group Code
+     * @param callback - A callback to be called after message is sent (returns error,message)
+     *
+     */
+    Zzish.registerWithClass = function(profileId, code, callback) {
+        var request = {
+            method: "POST",
+            url: baseUrl + "profiles/" + profileId + "/groups/" + code + "/contents/register",
+            data: {}
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, function (status, message) {
+                if (!err) {
+                    var list = [];
+                    for (i in data.payload.contents) {
+                        list.push(JSON.parse(data.payload.contents[i]));
+                    }
+                    callback(err, {code: data.payload.code, contents: list});
+                }
+                else {
+                    callback(status, message);
+                }
+            });
+        })
+    };
+
+    /**
+     * Login a User using student code and return list of contents
+     *
+     * @param scode - Zzish Student Code
+     * @param callback - A callback to be called after message is sent (returns error,message)
+     *
+     */
+    Zzish.logIntoClass = function(scode,callback) {
+        var request = {
+            method: "GET",
+            url: baseUrl + "groups/" + scode + "/contents/login"
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, function (status, message) {
+                if (!err) {
+                    var list = [];
+                    for (i in data.payload.contents) {
+                        list.push(JSON.parse(data.payload.contents[i]));
+                    }
+                    callback(err, {code: data.payload.code, contents: list});
+                }
+                else {
+                    callback(status, message);
+                }
+            });
+        })
+    };
+
+
+
     /**
      * send message to REST API
      *
@@ -175,15 +244,15 @@
         var message = buildSimulationMessage(data);
         var headers = {
             'Content-Type': 'application/json'
-        }
-        headers[header] = headerprefix + appId;    
-        
+        };
+        headers[header] = headerprefix + appId;
+
         if (logEnabled) console.log("Sending" + JSON.stringify(message));
         var request = {
             method: "POST",
             url: baseUrl + "statements",
             data: message
-        }
+        };
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
         })
@@ -270,7 +339,7 @@
                 //check if api returns 200
                 if (data.status == 200) {
                     //return payload as message will be null
-                    callback(data.status, data.payload);
+                    callback(undefined, data.payload);
                 }
                 else {
                     //return message
@@ -299,12 +368,12 @@
         var message = {
             uuid: id,
             name: name
-        }
+        };
         var request = {
             method: "POST",
             url: baseUrl + "profiles",
             data: message
-        }
+        };
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
         })
@@ -325,16 +394,16 @@
             uuid: id,
             name: name,
             payload: JSON.stringify(content)
-        }
+        };
         var request = {
             method: "POST",
-            url: baseUrl + "profiles/" + profileId + "/contents",
+            url: baseUrl + "profiles/" + profileId + "/contents/" + id,
             data: data
-        }
+        };
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
         });
-    }
+    };
 
     /**
      * Get a Zzish content object
@@ -346,23 +415,23 @@
         var request = {
             method: "GET",
             url: baseUrl + "profiles/" + profileId + "/contents/" + uuid
-        }
+        };
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
-                if (status == 200) {
-                    callback(200, data.payload.payload);
+                if (!err) {
+                    callback(err, JSON.parse(data.payload.payload));
                 }
                 else {
                     callback(status, message);
                 }
             });
         });
-    }
+    };
 
     /**
      * Get a list of Zzish content object
      * @param profileId - The id of the profile to which to get contents for
-     * @param callback - A callback to call when done (returns error AND (message or list of uuid,name))
+     * @param callback - A callback to call when done (returns error AND (message or list of zzish,name))
      */
     Zzish.listContent = function (profileId, callback) {
         var request = {
@@ -371,16 +440,16 @@
         }
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
-                if (status == 200) {
+                if (!err) {
                     var list = [];
                     for (i in data.payload) {
                         var result = {
                             uuid: data.payload[i].uuid,
-                            name: data.payload[i].name,
+                            name: data.payload[i].name
                         }
                         list.push(result);
                     }
-                    callback(200, list);
+                    callback(err, list);
                 }
                 else {
                     callback(status, message);
@@ -390,12 +459,12 @@
     }
 
     /**
-     * Publish a content to a group    
+     * Publish a content to a group
      * @param profileId - The id of the profile to which to get contents for
      * @param email - The email of the person so we can send them a link to register their account so they can access the group
-     * @param uuid - The uuid of the content
+     * @param zzish - The zzish of the content
      * @param code - The Zzish code of an existing class (optional)
-     * @param callback - A callback to call when done (returns error AND (message or list of uuid,name))
+     * @param callback - A callback to call when done (returns error AND (message or list of zzish,name))
      */
     Zzish.publishContentToGroup = function (profileId, email, uuid, code, callback) {
         var data = {};
@@ -407,13 +476,13 @@
         }
         var request = {
             method: "POST",
-            url: baseUrl + "profiles/" + profileId + "/contents/" + uuid,
+            url: baseUrl + "profiles/" + profileId + "/contents/" + uuid + "/publish",
             data: data
-        }
+        };
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
         });
-    }
+    };
 
 /**** USER STUFF ***/
 
@@ -510,6 +579,7 @@
         if (typeof request.method === 'undefined') {
             request.method = "POST";
         }
+        if (logEnabled) console.log('Proxy.request ',request);
         req = new XMLHttpRequest();
         req.addEventListener('load', function () {
             response(this, callback, logEnabled);
@@ -545,7 +615,7 @@
         callback(evt.currentTarget, null);
     }
 
-    /*** UUID STUFF from uuid.js ***/
+    /*** UUID STUFF from zzish.js ***/
 
 
     var _global = this;
@@ -641,7 +711,7 @@
     // **`v1()` - Generate time-based UUID**
     //
     // Inspired by https://github.com/LiosK/UUID.js
-    // and http://docs.python.org/library/uuid.html
+    // and http://docs.python.org/library/zzish.html
 
     // random #'s we need to init node and clockseq
     var _seedBytes = _rng();
@@ -655,10 +725,10 @@
     // Per 4.2.2, randomize (14 bit) clockseq
     var _clockseq = (_seedBytes[6] << 8 | _seedBytes[7]) & 0x3fff;
 
-    // Previous uuid creation time
+    // Previous zzish creation time
     var _lastMSecs = 0, _lastNSecs = 0;
 
-    // See https://github.com/broofa/node-uuid for API details
+    // See https://github.com/broofa/node-zzish for API details
     function v1(options, buf, offset) {
         var i = buf && offset || 0;
         var b = buf || [];
@@ -673,11 +743,11 @@
         // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
         var msecs = options.msecs != null ? options.msecs : new Date().getTime();
 
-        // Per 4.2.1.2, use count of uuid's generated during the current clock
+        // Per 4.2.1.2, use count of zzish's generated during the current clock
         // cycle to simulate higher resolution clock
         var nsecs = options.nsecs != null ? options.nsecs : _lastNSecs + 1;
 
-        // Time since last uuid creation (in msecs)
+        // Time since last zzish creation (in msecs)
         var dt = (msecs - _lastMSecs) + (nsecs - _lastNSecs) / 10000;
 
         // Per 4.2.1.2, Bump clockseq on clock regression
@@ -693,7 +763,7 @@
 
         // Per 4.2.1.2 Throw error if too many uuids are requested
         if (nsecs >= 10000) {
-            throw new Error('uuid.v1(): Can\'t create more than 10M uuids/sec');
+            throw new Error('zzish.v1(): Can\'t create more than 10M uuids/sec');
         }
 
         _lastMSecs = msecs;
@@ -736,7 +806,7 @@
 
     // **`v4()` - Generate random UUID**
 
-    // See https://github.com/broofa/node-uuid for API details
+    // See https://github.com/broofa/node-zzish for API details
     function v4(options, buf, offset) {
         // Deprecated - 'format' argument, as supported in v1.2
         var i = buf && offset || 0;
@@ -766,27 +836,27 @@
     // Export public API
 
 
-    var uuid = Zzish;
+    var zzish = Zzish;
 
     if (typeof define === 'function' && define.amd) {
         // Publish as AMD module
         define(function () {
-            return uuid;
+            return zzish;
         });
     } else if (typeof(module) != 'undefined' && module.exports) {
         // Publish as node.js module
-        module.exports = uuid;
+        module.exports = zzish;
     } else {
         // Publish as global (in browsers)
         var _previousRoot = _global.uuid;
 
-        // **`noConflict()` - (browser only) to reset global 'uuid' var**
-        uuid.noConflict = function () {
+        // **`noConflict()` - (browser only) to reset global 'zzish' var**
+        zzish.noConflict = function () {
             _global.zzish = _previousRoot;
-            return uuid;
+            return zzish;
         };
 
-        _global.zzish = uuid;
+        _global.zzish = zzish;
     }
 
 })();
