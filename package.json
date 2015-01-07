@@ -1,0 +1,24 @@
+{
+  "name": "zzishsdk",
+  "version": "0.1.0",
+  "description": "SDK for Zzish API",
+  "main": "zzish.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zzishdev/zzishsdk-js.git"
+  },
+  "keywords": [
+    "zzish",
+    "api",
+    "sdk"
+  ],
+  "author": "Zzish Developers <developers@zzish.com> (http://www.zzish.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zzishdev/zzishsdk-js/issues"
+  },
+  "homepage": "https://github.com/zzishdev/zzishsdk-js"
+}
