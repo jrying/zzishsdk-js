@@ -11,7 +11,6 @@
 
     <script src="zzish.js"></script>
     <script>
-        var activityId; 
         var userId;
         var init = false;
 
@@ -67,6 +66,17 @@
             else {
                 alert ("Please init with your APP_ID from http://www.zzish.co.uk/developer/")
             }
+        } 
+
+        function publishContentToGroup() {
+            if (init) {     
+                Zzish.publishContent(userId,$("#pemail").val(),$("#pid").val(),$("#pcode").val(),function(status,message) {
+                    $("#publishContentOutput").html(JSON.stringify(message));
+                });
+            }
+            else {
+                alert ("Please init with your APP_ID from http://www.zzish.co.uk/developer/")
+            }
         }          
     </script>
 </head>
@@ -94,5 +104,13 @@
 <input type="button" onclick="listContent()" value="Get Content"/><br/>
 <h2>Output</h2>
 <div id="listContentOutput"></div>
+<br/>
+<h1>Publish Content</h1>
+<input type="text" id="pid" name="pid" placeholder="Content Id" value=""/><br/>
+<input type="text" id="pemail" name="pemail" placeholder="Email Address of Creator" value=""/><br/>
+<input type="text" id="pcode" name="pcode" placeholder="Group Code" value=""/><br/>
+<input type="button" onclick="publishContent()" value="Publish Content"/><br/>
+<h2>Output</h2>
+<div id="publishContentOutput"></div>
 </body>
 </html>

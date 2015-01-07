@@ -1,0 +1,96 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+    <title>Zzish Quick Javascript Client SDK</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+
+    <script src="zzish.js"></script>
+    <script>
+        var profileId;
+        var init = false;
+
+        $(document).ready(function() {
+            logoutUser();
+        });
+
+        function logoutUser() {
+            profileId = "";
+            $("#groupButton").hide();
+            $("#profileIdSpan").html("You need to login");
+            $("#loginButton").val("Login");
+        }
+
+        function loginUser(data) {
+            profileId = data.uuid;
+            $("#profileIdSpan").html(profileId);
+            $("#loginButton").val("Logout");
+            $("#groupButton").show();
+        }
+
+        function initApp() {
+            Zzish.init($("#appId").val());
+            init = true;
+            console.log("App Initalized with id",$("#appId").val());
+        }
+
+        function register() {
+            Zzish.register(function(status,message) {
+                console.log("Register in with status and message",status,message);
+                if (status==200) {
+                    loginUser(message);
+                }
+            });
+        }
+
+        function login() {
+            if (profileId=="") {
+                Zzish.login(function(status,message) {
+                    console.log("Logged in with status and message",status,message);
+                    if (status==200) {
+                        loginUser(message);
+                    }
+                });
+            }
+            else {
+                Zzish.logout(profileId,function(status,message) {
+                    console.log("Logged in with status and message",status,message);
+                    if (status==200) {
+                        logoutUser();
+                    }
+                });                
+            }
+        }
+
+        function getGroups() {
+            if (init) {
+                Zzish.listGroups($("#profileId").val(),function(status,message) {
+                    $("#listGroupsOutput").html(JSON.stringify(message));
+                });
+                
+            }
+            else {
+                alert ("Please init with your APP_ID from http://www.zzish.co.uk/developer/")
+            }
+        }         
+    </script>
+</head>
+
+<body>
+<input type="text" id="appId" name="appId" placeholder="Your APP ID" value=""/><br/>
+<input type="button" onclick="initApp()" value="Initialise"/><br/>
+<h1>Register</h1>
+<input type="button" onclick="register()" value="Register"/><br/>
+<h1>Login</h1>
+<input type="button" onclick="login()" value="Login" id="loginButton"/><br/>
+<h1>List Groups</h1>
+Profile Id: <span id="profileIdSpan">You need to login to get a profile Id</span><br/>
+<input type="button" onclick="getGroups()" disabled="true" value="Get Groups" id="groupButton"/><br/>
+<h2>Output</h2>
+<div id="listGroupsOutput"></div>
+</body>
+</html>
