@@ -23,8 +23,8 @@
 
         function getUser() {
             if (init) {
-                userId = Zzish.getUser($("#userId").val(),$("#name").val(),function(err,message) {
-                    console.log("User created with status" + err);    
+                Zzish.getUser($("#userId").val(),$("#name").val(),function(err,message) {
+                    console.log("User created with status" + err + "for id" + message.uuid);    
                 });
                 
             }
@@ -35,7 +35,7 @@
 
         function startActivity() {
             if (init) {            
-                activityId = Zzish.startActivity(userId,$("#aname").val(),$("#groupCode").val(),function(err,message) {
+                activityId = Zzish.startActivity($("#userId").val(),$("#aname").val(),$("#groupCode").val(),function(err,message) {
                     console.log("Activity " + activityId + "started with status" + err);    
                 });
             }

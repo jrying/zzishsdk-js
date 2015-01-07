@@ -235,7 +235,7 @@
      *
      */
     var sendMessage = function (data, callback) {
-        data.userUuid = userId;
+        data.userUuid = currentUser.uuid;
         data.deviceId = deviceId;
         data.sessionId = sessionId;
         if (data.attributes == undefined) {
