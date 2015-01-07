@@ -21,10 +21,10 @@
             console.log("App Initalized with id",$("#appId").val());
         }
 
-        function createUser() {
+        function getUser() {
             if (init) {
-                userId = Zzish.getUser($("#userId").val(),$("#name").val(),function(status,message) {
-                    console.log("User created with status" + status);    
+                userId = Zzish.getUser($("#userId").val(),$("#name").val(),function(err,message) {
+                    console.log("User created with status" + err);    
                 });
                 
             }
@@ -35,8 +35,8 @@
 
         function startActivity() {
             if (init) {            
-                activityId = Zzish.startActivity(userId,$("#aname").val(),$("#groupCode").val(),function(status,message) {
-                    console.log("Activity " + activityId + "started with status" + status);    
+                activityId = Zzish.startActivity(userId,$("#aname").val(),$("#groupCode").val(),function(err,message) {
+                    console.log("Activity " + activityId + "started with status" + err);    
                 });
             }
             else {
@@ -47,8 +47,8 @@
 
         function logAction() {
             if (init) {                        
-                Zzish.logAction(activityId,$("#actname").val(),$("#response").val(),$("#Score").val(),$("#correct").val(),$("#Duration").val(),$("#Attempts").val(),$("#attributes").val(),function(status,message) {
-                    console.log("Action " + $("#actname").val() + "logged with status" + status);                
+                Zzish.logAction(activityId,$("#actname").val(),$("#response").val(),$("#Score").val(),$("#correct").val(),$("#Duration").val(),$("#Attempts").val(),$("#attributes").val(),function(err,message) {
+                    console.log("Action " + $("#actname").val() + "logged with status" + err);                
                 });            
             }
             else {
@@ -58,8 +58,8 @@
 
         function stopActivity() {
             if (init) {             
-                Zzish.stopActivity(activityId,$("#aattributes").val(),function(status,message) {
-                    console.log("Activity " + activityId + "stopped with status" + status);
+                Zzish.stopActivity(activityId,$("#aattributes").val(),function(err,message) {
+                    console.log("Activity " + activityId + "stopped with status" + err);
                 });            
             }
             else {
@@ -69,8 +69,8 @@
 
         function cancelActivity() {
             if (init) {                        
-                Zzish.cancelActivity(activityId,function(status,message) {
-                    console.log("Activity " + activityId + "cancelled with status" + status);
+                Zzish.cancelActivity(activityId,function(err,message) {
+                    console.log("Activity " + activityId + "cancelled with status" + err);
                 });            
             }
             else {
@@ -86,7 +86,7 @@
 <h1>Create user</h1>
 <input type="text" id="userId" name="userId" placeholder="userId" value=""/><br/>
 <input type="text" id="name" name="name" placeholder="Name" value=""/><br/>
-<input type="button" onclick="createUser()" value="Create User"/><br/>
+<input type="button" onclick="getUser()" value="Create User"/><br/>
 <br/>
 <h1>Start Activity</h1>
 <input type="text" id="groupCode" name="groupCode" placeholder="Class code" value=""/><br/>
