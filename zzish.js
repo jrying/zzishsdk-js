@@ -21,11 +21,12 @@
 
     var header = "X-ApplicationId";    
     //var header = "Authorization";
-    var baseUrl = "http://localhost:8080/zzishapi/api/";
-    //var baseUrl = "http://api.zzish.co.uk/api/";
+    //var baseUrl = "http://localhost:8080/zzishapi/api/";
+    var baseUrl = "http://api.zzish.co.uk/api/";
     var headerprefix = "";    
     //var headerprefix = "Bearer ";
-    var stateless = true;
+    //make SDK stateless to test
+    var makeStateless = false;
     
     
     //logEnabled
@@ -64,7 +65,7 @@
      */
     function stateful() {
         //if localstorage is not defined
-        if (stateless) return false;
+        if (makeStateless) return false;
         return (typeof localStorage != 'undefined');
     }
 
@@ -201,10 +202,10 @@
 
 
     /**
-     * Register a User with a class using group Code and return list of contents ("contents") and the zzish studen code ("code")
+     * Register a User with a class using class Code and return list of contents ("contents") and the zzish studen code ("code")
      *
      * @param profileId - The Profile Id
-     * @param code - The Zzish group Code
+     * @param code - The Zzish class Code
      * @param callback - A callback to be called after message is sent (returns error,message)
      *
      */
