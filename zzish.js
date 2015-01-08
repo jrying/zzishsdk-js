@@ -21,10 +21,11 @@
 
     var header = "X-ApplicationId";    
     //var header = "Authorization";
-    //var baseUrl = "http://localhost:8080/zzishapi/api/";
-    var baseUrl = "http://api.zzish.co.uk/api/";
+    var baseUrl = "http://localhost:8080/zzishapi/api/";
+    //var baseUrl = "http://api.zzish.co.uk/api/";
     var headerprefix = "";    
     //var headerprefix = "Bearer ";
+    var stateless = true;
     
     
     //logEnabled
@@ -35,7 +36,7 @@
      */
     Zzish.init = function (applicationId) {
         //generate a device if we don't have one
-        if (typeof localStorage != 'undefined') {
+        if (stateful()) {
             deviceId = localStorage.getItem("deviceId");
             if (deviceId == null) {
                 deviceId = v4();
@@ -45,7 +46,28 @@
         appId = applicationId;
     };
 
-/**** CLIENT SIDE (REQUIRE STATE METHOD) *****/
+/**** SERVER SIDE (NO STATE) *****/  
+
+    /**
+     * Presets the deviceId and SessionId which the developer stores if there is not state to store that info
+     */
+    Zzish.initState = function(iDeviceId,iSessionId) {
+        deviceId = iDeviceId;
+        sessionId = iSessionId;
+        return zzish;
+    };
+
+/**** CLIENT SIDE (REQUIRE STATE) *****/
+
+    /**
+     * Checks to see if localStorage is defined. Then it's a stateful session
+     */
+    function stateful() {
+        //if localstorage is not defined
+        if (stateless) return false;
+        return (typeof localStorage != 'undefined');
+    }
+
 
     /**
      * Get the User (if the id is the same as the current one, returns the current user)
@@ -53,21 +75,27 @@
      * @param id - A unique Id for the user (required)
      * @param name - The name of the user (optional)
      * @param callback - An optional callback after user has been saved on server
-     * @return The user Id (returns the same id provided or a generated one)
+     * @return The user (returns a server user if it already exists). If it's the current User, returns that user
      */
     Zzish.getUser = function (id, name, callback) {
         if (id==undefined) id = v4();
-        if (currentUser==undefined || currentUser.id != id) {
-            sessionId = v4();
-            Zzish.createUser(id,name,function(err,message) {
-                if (!err) {
-                    currentUser = message;
-                }
-                callback(err,currentUser);
-            });
+        if (stateful()) {
+            //that means we have a front end service so we can check state
+            if (currentUser==undefined || currentUser.id != id) {
+                Zzish.createUser(id,name,function(err,message) {
+                    if (!err) {
+                        //set the current user if we don't have an error
+                        currentUser = message;
+                    }
+                    callback(err,currentUser);
+                });
+            }
+            else {
+                callCallBack(null, currentUser, callback);
+            }            
         }
         else {
-            callCallBack(null, currentUser, callback);
+            Zzish.createUser(id,name,callback);
         }
     };
 
@@ -81,6 +109,11 @@
      * @return The activity zzish
      */
     Zzish.startActivity = function (userId, name, code, callback) {
+        if (!currentUser) {
+            currentUser = {
+                uuid: userId
+            }
+        };
         aid = v4();
         sendMessage({
             verb: "http://activitystrea.ms/schema/1.0/start",
