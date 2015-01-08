@@ -12,13 +12,23 @@
     <script src="zzish.js"></script>
     <script>
         var activityId; 
-        var userId;
-        var init = false;
+            var init = false;
 
         function initApp() {
             Zzish.init($("#appId").val());
             init = true;
             console.log("App Initalized with id",$("#appId").val());
+        }
+
+        function stateless() {
+            if (init) {
+                Zzish.initState("123456","s2342523523").getUser(1231313,"234243234",function(err,message) {
+                    console.log("User" + err + " message" + message);
+                })            
+            }
+            else {
+                alert ("Please init with your APP_ID from http://www.zzish.co.uk/developer/")
+            }
         }
 
         function getUser() {
@@ -86,7 +96,7 @@
 <h1>Create user</h1>
 <input type="text" id="userId" name="userId" placeholder="userId" value=""/><br/>
 <input type="text" id="name" name="name" placeholder="Name" value=""/><br/>
-<input type="button" onclick="getUser()" value="Create User"/><br/>
+<input type="button" onclick="stateless()" value="Create User"/><br/>
 <br/>
 <h1>Start Activity</h1>
 <input type="text" id="groupCode" name="groupCode" placeholder="Class code" value=""/><br/>

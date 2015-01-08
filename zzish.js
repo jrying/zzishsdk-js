@@ -25,6 +25,8 @@
     var baseUrl = "http://api.zzish.co.uk/api/";
     var headerprefix = "";    
     //var headerprefix = "Bearer ";
+    //make SDK stateless to test
+    var makeStateless = false;
     
     
     //logEnabled
@@ -35,7 +37,7 @@
      */
     Zzish.init = function (applicationId) {
         //generate a device if we don't have one
-        if (typeof localStorage != 'undefined') {
+        if (stateful()) {
             deviceId = localStorage.getItem("deviceId");
             if (deviceId == null) {
                 deviceId = v4();
@@ -45,7 +47,28 @@
         appId = applicationId;
     };
 
-/**** CLIENT SIDE (REQUIRE STATE METHOD) *****/
+/**** SERVER SIDE (NO STATE) *****/  
+
+    /**
+     * Presets the deviceId and SessionId which the developer stores if there is not state to store that info
+     */
+    Zzish.initState = function(iDeviceId,iSessionId) {
+        deviceId = iDeviceId;
+        sessionId = iSessionId;
+        return zzish;
+    };
+
+/**** CLIENT SIDE (REQUIRE STATE) *****/
+
+    /**
+     * Checks to see if localStorage is defined. Then it's a stateful session
+     */
+    function stateful() {
+        //if localstorage is not defined
+        if (makeStateless) return false;
+        return (typeof localStorage != 'undefined');
+    }
+
 
     /**
      * Get the User (if the id is the same as the current one, returns the current user)
@@ -53,21 +76,27 @@
      * @param id - A unique Id for the user (required)
      * @param name - The name of the user (optional)
      * @param callback - An optional callback after user has been saved on server
-     * @return The user Id (returns the same id provided or a generated one)
+     * @return The user (returns a server user if it already exists). If it's the current User, returns that user
      */
     Zzish.getUser = function (id, name, callback) {
         if (id==undefined) id = v4();
-        if (currentUser==undefined || currentUser.id != id) {
-            sessionId = v4();
-            Zzish.createUser(id,name,function(err,message) {
-                if (!err) {
-                    currentUser = message;
-                }
-                callback(err,currentUser);
-            });
+        if (stateful()) {
+            //that means we have a front end service so we can check state
+            if (currentUser==undefined || currentUser.id != id) {
+                Zzish.createUser(id,name,function(err,message) {
+                    if (!err) {
+                        //set the current user if we don't have an error
+                        currentUser = message;
+                    }
+                    callback(err,currentUser);
+                });
+            }
+            else {
+                callCallBack(null, currentUser, callback);
+            }            
         }
         else {
-            callCallBack(null, currentUser, callback);
+            Zzish.createUser(id,name,callback);
         }
     };
 
@@ -81,6 +110,11 @@
      * @return The activity zzish
      */
     Zzish.startActivity = function (userId, name, code, callback) {
+        if (!currentUser) {
+            currentUser = {
+                uuid: userId
+            }
+        };
         aid = v4();
         sendMessage({
             verb: "http://activitystrea.ms/schema/1.0/start",
@@ -147,7 +181,7 @@
             action["score"] = parseFloat(score);
         }
         if (correct != undefined) {
-            action["correct"] = parseInt(correct);
+            action["correct"] = correct;
         }
         if (duration != undefined) {
             action["duration"] = parseInt(duration);
@@ -168,10 +202,10 @@
 
 
     /**
-     * Register a User with a class using group Code and return list of contents ("contents") and the zzish studen code ("code")
+     * Register a User with a class using class Code and return list of contents ("contents") and the zzish studen code ("code")
      *
      * @param profileId - The Profile Id
-     * @param code - The Zzish group Code
+     * @param code - The Zzish class Code
      * @param callback - A callback to be called after message is sent (returns error,message)
      *
      */
@@ -185,7 +219,7 @@
             callCallBack(err, data, function (status, message) {
                 if (!err) {
                     var list = [];
-                    for (i in data.payload.contents) {
+                    for (var i in data.payload.contents) {
                         list.push(JSON.parse(data.payload.contents[i]));
                     }
                     callback(err, {code: data.payload.code, contents: list});
@@ -213,8 +247,10 @@
             callCallBack(err, data, function (status, message) {
                 if (!err) {
                     var list = [];
-                    for (i in data.payload.contents) {
-                        list.push(JSON.parse(data.payload.contents[i]));
+                    if (data.payload) {
+                        for (var i in data.payload.contents) {
+                            list.push(JSON.parse(data.payload.contents[i]));
+                        }
                     }
                     callback(err, {code: data.payload.code, contents: list});
                 }
@@ -437,26 +473,28 @@
         var request = {
             method: "GET",
             url: baseUrl + "profiles/" + profileId + "/contents"
-        }
+        };
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
                 if (!err) {
                     var list = [];
-                    for (i in data.payload) {
-                        var result = {
-                            uuid: data.payload[i].uuid,
-                            name: data.payload[i].name
+                    if (data){
+                        for (var i in data.payload) {
+                            var result = {
+                                uuid: data.payload[i].uuid,
+                                name: data.payload[i].name
+                            };
+                            list.push(result);
                         }
-                        list.push(result);
                     }
-                    callback(err, list);
+                   callback(err, list);
                 }
                 else {
                     callback(status, message);
                 }
             });
         });
-    }
+    };
 
     /**
      * Publish a content to a group
