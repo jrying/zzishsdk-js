@@ -180,7 +180,7 @@
             action["score"] = parseFloat(score);
         }
         if (correct != undefined) {
-            action["correct"] = parseInt(correct);
+            action["correct"] = correct;
         }
         if (duration != undefined) {
             action["duration"] = parseInt(duration);
@@ -218,7 +218,7 @@
             callCallBack(err, data, function (status, message) {
                 if (!err) {
                     var list = [];
-                    for (i in data.payload.contents) {
+                    for (var i in data.payload.contents) {
                         list.push(JSON.parse(data.payload.contents[i]));
                     }
                     callback(err, {code: data.payload.code, contents: list});
@@ -246,8 +246,10 @@
             callCallBack(err, data, function (status, message) {
                 if (!err) {
                     var list = [];
-                    for (i in data.payload.contents) {
-                        list.push(JSON.parse(data.payload.contents[i]));
+                    if (data.payload) {
+                        for (var i in data.payload.contents) {
+                            list.push(JSON.parse(data.payload.contents[i]));
+                        }
                     }
                     callback(err, {code: data.payload.code, contents: list});
                 }
@@ -470,26 +472,28 @@
         var request = {
             method: "GET",
             url: baseUrl + "profiles/" + profileId + "/contents"
-        }
+        };
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
                 if (!err) {
                     var list = [];
-                    for (i in data.payload) {
-                        var result = {
-                            uuid: data.payload[i].uuid,
-                            name: data.payload[i].name
+                    if (data){
+                        for (var i in data.payload) {
+                            var result = {
+                                uuid: data.payload[i].uuid,
+                                name: data.payload[i].name
+                            };
+                            list.push(result);
                         }
-                        list.push(result);
                     }
-                    callback(err, list);
+                   callback(err, list);
                 }
                 else {
                     callback(status, message);
                 }
             });
         });
-    }
+    };
 
     /**
      * Publish a content to a group
