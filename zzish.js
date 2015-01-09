@@ -512,6 +512,7 @@
         }
         if (email!=undefined && email!='') {
             data['email'] = email;
+            Zzish.sendRegister(profileId,email);
         }
         var request = {
             method: "POST",
