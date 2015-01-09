@@ -83,6 +83,7 @@
         if (stateful()) {
             //that means we have a front end service so we can check state
             if (currentUser==undefined || currentUser.id != id) {
+                sessionId = v4();
                 Zzish.createUser(id,name,function(err,message) {
                     if (!err) {
                         //set the current user if we don't have an error
