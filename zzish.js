@@ -88,7 +88,7 @@
                         //set the current user if we don't have an error
                         currentUser = message;
                     }
-                    callback(err,currentUser);
+                    callCallBack(err, message, callback);
                 });
             }
             else {
@@ -104,12 +104,12 @@
      * Start Activity with name
      *
      * @param userId - The userId of the user (required)
-     * @param name - The name of the activity (required)
+     * @param activityName - The name of the activity (required)
      * @param code - The Zzish Class Code when creating a class in the learning hub (optional)
      * @param callback - A callback to be called after message is sent (returns error,message)
      * @return The activity zzish
      */
-    Zzish.startActivity = function (userId, name, code, callback) {
+    Zzish.startActivity = function (userId, activityName, code, callback) {
         if (!currentUser) {
             currentUser = {
                 uuid: userId
@@ -118,7 +118,7 @@
         aid = v4();
         sendMessage({
             verb: "http://activitystrea.ms/schema/1.0/start",
-            activityName: name,
+            activityName: activityName,
             activityUuid: aid,
             classCode: code
         }, callback);
@@ -128,38 +128,38 @@
     /**
      * stop Activity with aid
      *
-     * @param aid - The activity id (returned from startActivity) (required)
+     * @param activityId - The activity id (returned from startActivity) (required)
      * @param states - A string represented JSON of attributes to save for this activity (optional)
      * @param callback - A callback to be called after message is sent (returns error,message)
      *
      */
-    Zzish.stopActivity = function (aid, states, callback) {
+    Zzish.stopActivity = function (activityId, states, callback) {
         sendMessage({
             verb: "http://activitystrea.ms/schema/1.0/complete",
             attributes: states,
-            activityUuid: aid
+            activityUuid: activityId
         }, callback)
     };
 
     /**
      * Cancel Activity with aid
      *
-     * @param aid - The activity id (returned from startActivity) (required)
+     * @param activityId - The activity id (returned from startActivity) (required)
      * @param callback - A callback to be called after message is sent (returns error,message)
      *
      */
-    Zzish.cancelActivity = function (aid, callback) {
+    Zzish.cancelActivity = function (activityId, callback) {
         sendMessage({
             verb: "http://activitystrea.ms/schema/1.0/cancel",
-            activityUuid: aid
+            activityUuid: activityId
         }, callback)
     };
 
     /**
      * Log an Action
      *
-     * @param aid - The activity id (returned from startActivity) (required)
-     * @param name - The name of the action (required)
+     * @param activityId - The activity id (returned from startActivity) (required)
+     * @param actionName - The name of the action (required)
      * @param response - A string representation of the action (optional)
      * @param score - A float score (optional)
      * @param duration - A long duration (optional)
@@ -168,10 +168,10 @@
      * @param callback - A callback to be called after message is sent (returns error,message)
      *
      */
-    Zzish.logAction = function (aid, name, response, score, correct, duration, attempts, attributes, callback) {
+    Zzish.logAction = function (activityId, actionName, response, score, correct, duration, attempts, attributes, callback) {
         var action = {
             definition: {
-                type: name
+                type: actionName
             }
         };
         if (response != undefined) {
@@ -195,17 +195,17 @@
         }
         sendMessage({
             verb: "http://activitystrea.ms/schema/1.0/start",
-            activityUuid: aid,
+            activityUuid: activityId,
             actions: [action]
         }, callback);
     };
 
 
     /**
-     * Register a User with a class using class Code and return list of contents ("contents") and the zzish studen code ("code")
+     * Register a User with a class using group Code and return list of contents ("contents") and the zzish studen code ("code")
      *
      * @param profileId - The Profile Id
-     * @param code - The Zzish class Code
+     * @param code - The Zzish group Code
      * @param callback - A callback to be called after message is sent (returns error,message)
      *
      */

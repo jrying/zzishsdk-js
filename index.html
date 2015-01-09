@@ -46,7 +46,12 @@
         function startActivity() {
             if (init) {            
                 activityId = Zzish.startActivity($("#userId").val(),$("#aname").val(),$("#groupCode").val(),function(err,message) {
-                    console.log("Activity " + activityId + "started with status" + err);    
+                    if (err) {
+                        console.log("Activity " + message.uuid + "started");        
+                    }
+                    else {
+                        console.log("Error starting" + err)
+                    }
                 });
             }
             else {
@@ -58,7 +63,12 @@
         function logAction() {
             if (init) {                        
                 Zzish.logAction(activityId,$("#actname").val(),$("#response").val(),$("#Score").val(),$("#correct").val(),$("#Duration").val(),$("#Attempts").val(),$("#attributes").val(),function(err,message) {
-                    console.log("Action " + $("#actname").val() + "logged with status" + err);                
+                    if (err) {
+                        console.log("logAction " + message.uuid + "started");        
+                    }
+                    else {
+                        console.log("Error starting" + err)
+                    }
                 });            
             }
             else {
@@ -69,7 +79,12 @@
         function stopActivity() {
             if (init) {             
                 Zzish.stopActivity(activityId,$("#aattributes").val(),function(err,message) {
-                    console.log("Activity " + activityId + "stopped with status" + err);
+                    if (err) {
+                        console.log("Activity " + message.uuid + "started");        
+                    }
+                    else {
+                        console.log("Error starting" + err)
+                    }
                 });            
             }
             else {
@@ -80,7 +95,12 @@
         function cancelActivity() {
             if (init) {                        
                 Zzish.cancelActivity(activityId,function(err,message) {
-                    console.log("Activity " + activityId + "cancelled with status" + err);
+                    if (err) {
+                        console.log("Activity " + message.uuid + "cancelled");        
+                    }
+                    else {
+                        console.log("Error starting" + err)
+                    }
                 });            
             }
             else {
