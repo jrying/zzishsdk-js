@@ -60,19 +60,7 @@
                     }
                 });                
             }
-        }
-
-        function getGroups() {
-            if (init) {
-                Zzish.listGroups($("#profileId").val(),function(status,message) {
-                    $("#listGroupsOutput").html(JSON.stringify(message));
-                });
-                
-            }
-            else {
-                alert ("Please init with your APP_ID from http://www.zzish.co.uk/developer/")
-            }
-        }         
+        }        
     </script>
 </head>
 

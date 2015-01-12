@@ -528,40 +528,6 @@
 
 /**** USER STUFF ***/
 
-    /**
-     * Send Register Request
-     * @param profileId - The User Id you have used to identify the User
-     * @param email - The email address to send the register request
-     */
-    Zzish.sendRegister = function (profileId,email,callback) {
-        var data = {
-            email: email
-        };
-        var request = {
-            method: "POST",
-            url: baseUrl + "profiles/" + profileId+ "/sendregister",
-            data: data
-        }
-        sendData(request, function (err, data) {
-            callCallBack(err, data, callback);
-        });
-    }
-
-    /**
-     * Register with zzish
-     * @param callback - A callback to call when done (returns error AND (message or user))
-     */
-    Zzish.register = function (callback) {
-        var token_request = {
-            method: "POST",
-            url: baseUrl + "profiles/register"
-        }
-        //create a token first
-        // sendData(token_request, function (err, data) {
-        //     callCallBack(err, data, callback);
-        // });
-        callback(200,{uuid: 12345});
-    }
 
     function getCurrentBaseUrl() {
         var pathArray = window.location.href.split( '/' );
@@ -623,20 +589,6 @@
         var request = {
             method: "DELETE",
             url: baseUrl + "profiles/tokens/" + token
-        }
-        sendData(request, function (err, data) {
-            callCallBack(err, data, callback);
-        });
-    }
-
-    /**
-     * Logout from Zzish
-     * @param callback - A callback to call when done (returns error AND (message or user))
-     */
-    Zzish.listGroups = function (profileId, callback) {
-        var request = {
-            method: "GET",
-            url: baseUrl + "profiles/" + profileId + "/groups"
         }
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
