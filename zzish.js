@@ -605,7 +605,7 @@
         });
     }
 
-    function getCurrentUser(token,callback) {
+    Zzish.getCurrentUser = function(token,callback) {
         if (token==undefined) {
             //see if we can get token from query params
             token = getQueryParams()["token"];
