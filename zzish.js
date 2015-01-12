@@ -21,12 +21,15 @@
 
     var header = "X-ApplicationId";    
     //var header = "Authorization";
-    //var baseUrl = "http://localhost:8080/zzishapi/api/";
-    var baseUrl = "http://api.zzish.co.uk/api/";
+    var baseUrl = "http://localhost:8080/zzishapi/api/";
+    //var baseUrl = "http://api.zzish.co.uk/api/";
     var headerprefix = "";    
     //var headerprefix = "Bearer ";
     //make SDK stateless to test
     var makeStateless = false;
+
+    //var webUrl = "http://www.zzish.com/"
+    var webUrl = "http://localhost:3000/"
     
     
     //logEnabled
@@ -512,7 +515,6 @@
         }
         if (email!=undefined && email!='') {
             data['email'] = email;
-            Zzish.sendRegister(profileId,email);
         }
         var request = {
             method: "POST",
@@ -540,7 +542,6 @@
             url: baseUrl + "profiles/" + profileId+ "/sendregister",
             data: data
         }
-        //create a token first
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
         });
@@ -569,28 +570,56 @@
     Zzish.login = function (callback) {
         var token_request = {
             method: "POST",
-            url: baseUrl + "profiles/tokens"
+            url: baseUrl + "profiles/tokens",
+            data: {}
         }
         //create a token first
-        // sendData(token_request, function (err, data) {
-        //     callCallBack(err, data, callback);
-        // });
-        callback(200,{uuid: 12345});
+        sendData(token_request, function (err, data) {
+            callCallBack(err, data, function(err,token) {
+                var url = webUrl + '/account/login?token=' + token;
+                var win = window.open(url, 'Zzish Login', 'width=800, height=600');
+                var pollTimer = window.setInterval(
+                    function() { 
+                      try {
+                        if (win.document.URL.indexOf(webUrl) === -1) {
+                          window.clearInterval(pollTimer);
+                          win.close();
+                          loadUser(token,callback);
+                        }
+                      } catch(e) {
+                      }
+                    }, 500);
+            });
+        });
+    }
+
+    function loadUser(token,callback) {
+        var token_request = {
+            method: "GET",
+            url: baseUrl + "profiles/tokens/" + token
+        }
+        //create a token first
+        sendData(token_request, function (err, data) {
+            callCallBack(err, data, function(err,data) {                
+                console.log('user', JSON.strintify(data));
+                data.token = token;
+                callback(err,data);             
+            });
+        });        
     }
 
     /**
      * Logout from Zzish
      * @param callback - A callback to call when done (returns error AND (message or user))
      */
-    Zzish.logout = function (profileId,callback) {
+    Zzish.logout = function (token,callback) {
         var request = {
-            method: "POST",
-            url: baseUrl + "profiles/" + profileId + "/logout"
+            method: "DELETE",
+            url: baseUrl + "profiles/tokens/" + token
         }
-        // sendData(request, function (err, data) {
-        //     callCallBack(err, data, callback);
-        // });
-        callback(200);
+        sendData(request, function (err, data) {
+            callCallBack(err, data, callback);
+        });
     }
 
     /**
