@@ -45,7 +45,7 @@
 
         function login() {
             if (profileId=="") {
-                Zzish.login(function(status,message) {
+                Zzish.login(function(err,message) {
                     console.log("Logged in with status and message",err,message);
                     if (!err) {
                         loginUser(message);
@@ -53,7 +53,7 @@
                 });
             }
             else {
-                Zzish.logout(token,function(status,message) {
+                Zzish.logout(token,function(err,message) {
                     console.log("Logged in with status and message",err,message);
                     if (!err) {
                         logoutUser();
