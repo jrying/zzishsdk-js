@@ -538,13 +538,14 @@
 
     /**
      * Login to Zzish
+     * @param successUrl - A URL hosted on the domain you are calling so that it can monitor success (will redirect to this page after succesful login and then close the page)
      * @param callback - A callback to call when done (returns error AND (message or user))
      */
-    Zzish.login = function (callback) {
+    Zzish.login = function (successUrl,callback) {
         var token_request = {
             method: "POST",
             url: baseUrl + "profiles/tokens",
-            data: { redirectURL: getCurrentBaseUrl() + "/success"}
+            data: { redirectURL: successUrl }
         }
         //create a token first
         sendData(token_request, function (err, data) {

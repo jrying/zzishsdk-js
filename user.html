@@ -45,7 +45,7 @@
 
         function login() {
             if (profileId=="") {
-                Zzish.login(function(err,message) {
+                Zzish.login("http://http://zzish.github.io/zzishsdk-js/success.html",function(err,message) {
                     console.log("Logged in with status and message",err,message);
                     if (!err) {
                         loginUser(message);
