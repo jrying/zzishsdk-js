@@ -61,7 +61,7 @@
             }
         }
         catch (err) {
-            
+
         }
         return params;
     }
@@ -584,18 +584,23 @@
         sendData(token_request, function (err, data) {
             callCallBack(err, data, function(err,token) {
                 var url = webUrl + 'account/login?token=' + token;
-                var win = window.open(url, 'Zzish Login', 'width=800, height=600');
-                var pollTimer = window.setInterval(
-                    function() { 
-                      try {
-                        if (win.document.URL.indexOf(webUrl) === -1) {
-                          window.clearInterval(pollTimer);
-                          win.close();
-                          Zzish.getCurrentUser(token,callback);
-                        }
-                      } catch(e) {
-                      }
-                    }, 500);
+                if (type=="pop") {                    
+                    var win = window.open(url, 'Zzish Login', 'width=800, height=600');
+                    var pollTimer = window.setInterval(
+                        function() { 
+                          try {
+                            if (win.document.URL.indexOf(webUrl) === -1) {
+                              window.clearInterval(pollTimer);
+                              win.close();
+                              Zzish.getCurrentUser(token,callback);
+                            }
+                          } catch(e) {
+                          }
+                        }, 500);                    
+                }
+                else {
+                    window.location.href = url; 
+                }
             });
         });
     }
