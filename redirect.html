@@ -12,6 +12,7 @@
     		console.log("Loading zzish");
     		Zzish.getCurrentUser(null,function (err,data) {    			
     			if (!err) {
+    				console.log("Error",data);
 		            $("#profileIdSpan").html(data.id);
 		            $("#profileNameSpan").html(data.name);    			    				
     			}
