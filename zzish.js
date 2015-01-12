@@ -49,17 +49,20 @@
     var makeStateless = false;
 
 
-    function getQueryParams(qs) {
-        qs = qs.split("+").join(" ");
-
+    function getQueryParams() {
         var params = {}, tokens,
             re = /[?&]?([^=]+)=([^&]*)/g;
+        try {
+            qs = location.search.split("+").join(" ");
 
-        while (tokens = re.exec(qs)) {
-            params[decodeURIComponent(tokens[1])]
-                = decodeURIComponent(tokens[2]);
+            while (tokens = re.exec(qs)) {
+                params[decodeURIComponent(tokens[1])]
+                    = decodeURIComponent(tokens[2]);
+            }
         }
-
+        catch (err) {
+            
+        }
         return params;
     }
 
@@ -78,11 +81,12 @@
         appId = applicationId;
     };
 
-    var params = getQueryParams(location.search);
+    var params = getQueryParams();
 
     if (params["zzishtoken"]!=undefined) {
         Zzish.init(params["zzishtoken"]);
     }
+
 
 
 /**** SERVER SIDE (NO STATE) *****/  
@@ -564,13 +568,6 @@
 /**** USER STUFF ***/
 
 
-    function getCurrentBaseUrl() {
-        var pathArray = window.location.href.split( '/' );
-        var protocol = pathArray[0];
-        var host = pathArray[2];
-        return protocol + '//' + host;        
-    }
-
     /**
      * Login to Zzish
      * @param type - "pop" (default) will do a popup. "redirect" will go to zzish and then come back
@@ -594,7 +591,7 @@
                         if (win.document.URL.indexOf(webUrl) === -1) {
                           window.clearInterval(pollTimer);
                           win.close();
-                          loadUser(token,callback);
+                          Zzish.getCurrentUser(token,callback);
                         }
                       } catch(e) {
                       }
@@ -603,19 +600,25 @@
         });
     }
 
-    function loadUser(token,callback) {
-        var token_request = {
-            method: "GET",
-            url: baseUrl + "profiles/tokens/" + token
+    function getCurrentUser(token,callback) {
+        if (token==undefined) {
+            //see if we can get token from query params
+            token = getQueryParams()["token"];
         }
-        //create a token first
-        sendData(token_request, function (err, data) {
-            callCallBack(err, data, function(err,data) {                
-                console.log('user', data);
-                data.token = token;
-                callback(err,data);             
-            });
-        });        
+        if (token!=undefined) {
+            var token_request = {
+                method: "GET",
+                url: baseUrl + "profiles/tokens/" + token
+            }
+            //create a token first
+            sendData(token_request, function (err, data) {
+                callCallBack(err, data, function(err,data) {                
+                    console.log('user', data);
+                    data.token = token;
+                    callback(err,data);             
+                });
+            });    
+        }    
     }
 
     /**

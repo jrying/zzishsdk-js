@@ -44,16 +44,16 @@
         }
 
         function loginPop() {
-            loginCommand("pop");
+            loginCommand("pop","success.html");
         }
 
         function loginRedirect() {
-            loginCommand("redirect")
+            loginCommand("redirect","redirect.html")
         }
 
-        function loginCommand(type) {
+        function loginCommand(type,redirectURL) {
             if (profileId=="") {
-                Zzish.login(type,"http://zzish.github.io/zzishsdk-js/success.html",function(err,message) {
+                Zzish.login(type,"http://zzish.github.io/zzishsdk-js/"+redirectURL,function(err,message) {
                     console.log("Logged in with status and message",err,message);
                     if (!err) {
                         loginUser(message);

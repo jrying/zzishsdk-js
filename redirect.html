@@ -1,0 +1,29 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Zzish Login Success</title>
+    <script src="zzish.js"></script>
+
+    <script>
+    	function loadDetails() {
+    		Zzish.getCurrentUser(null,function (err,data) {    			
+    			if (!err) {
+		            $("#profileIdSpan").html(data.id);
+		            $("#profileNameSpan").html(data.name);    			    				
+    			}
+    		})
+    	}
+    </script>
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+</head>
+
+Profile Id: <span id="profileIdSpan">You need to login to get a profile Id</span><br/>
+Profile Name: <span id="profileNameSpan">You need to login to get a profile Name</span><br/>
+
+<input type="button" onclick="loadDetails()" value="Login with Popup"/><br/>
+
+<body>
+</body>
+</html>
