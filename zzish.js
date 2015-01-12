@@ -563,6 +563,13 @@
         callback(200,{uuid: 12345});
     }
 
+    function getCurrentBaseUrl() {
+        var pathArray = window.location.href.split( '/' );
+        var protocol = pathArray[0];
+        var host = pathArray[2];
+        return protocol + '//' + host;        
+    }
+
     /**
      * Login to Zzish
      * @param callback - A callback to call when done (returns error AND (message or user))
@@ -571,7 +578,7 @@
         var token_request = {
             method: "POST",
             url: baseUrl + "profiles/tokens",
-            data: {}
+            data: { redirectURL: getCurrentBaseUrl() + "/success"}
         }
         //create a token first
         sendData(token_request, function (err, data) {
