@@ -608,7 +608,7 @@
         //create a token first
         sendData(token_request, function (err, data) {
             callCallBack(err, data, function(err,data) {                
-                console.log('user', JSON.strintify(data));
+                console.log('user', data);
                 data.token = token;
                 callback(err,data);             
             });
