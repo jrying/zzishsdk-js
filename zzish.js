@@ -21,15 +21,15 @@
 
     var header = "X-ApplicationId";    
     //var header = "Authorization";
-    var baseUrl = "http://localhost:8080/zzishapi/api/";
-    //var baseUrl = "http://api.zzish.co.uk/api/";
+    //var baseUrl = "http://localhost:8080/zzishapi/api/";
+    var baseUrl = "http://api.zzish.co.uk/api/";
     var headerprefix = "";    
     //var headerprefix = "Bearer ";
     //make SDK stateless to test
     var makeStateless = false;
 
-    //var webUrl = "http://www.zzish.com/"
-    var webUrl = "http://localhost:3000/"
+    var webUrl = "http://www.zzish.com/"
+    //var webUrl = "http://localhost:3000/"
     
     
     //logEnabled
