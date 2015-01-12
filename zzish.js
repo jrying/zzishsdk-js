@@ -576,7 +576,7 @@
         //create a token first
         sendData(token_request, function (err, data) {
             callCallBack(err, data, function(err,token) {
-                var url = webUrl + '/account/login?token=' + token;
+                var url = webUrl + 'account/login?token=' + token;
                 var win = window.open(url, 'Zzish Login', 'width=800, height=600');
                 var pollTimer = window.setInterval(
                     function() { 
