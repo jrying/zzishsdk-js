@@ -24,6 +24,7 @@
             $("#groupButton").hide();
             $("#profileIdSpan").html("You need to login");
             $("#profileNameSpan").html("You need to login");
+            token = null;
             $("#loginButton").val("Login");
         }
 
@@ -42,19 +43,10 @@
             console.log("App Initalized with id",$("#appId").val());
         }
 
-        function register() {
-            Zzish.register(function(status,message) {
-                console.log("Register in with status and message",status,message);
-                if (status==200) {
-                    loginUser(message);
-                }
-            });
-        }
-
         function login() {
             if (profileId=="") {
                 Zzish.login(function(status,message) {
-                    console.log("Logged in with status and message",status,message);
+                    console.log("Logged in with status and message",err,message);
                     if (!err) {
                         loginUser(message);
                     }
@@ -62,8 +54,8 @@
             }
             else {
                 Zzish.logout(token,function(status,message) {
-                    console.log("Logged in with status and message",status,message);
-                    if (status==200) {
+                    console.log("Logged in with status and message",err,message);
+                    if (!err) {
                         logoutUser();
                     }
                 });                
@@ -87,8 +79,6 @@
 <body>
 <input type="text" id="appId" name="appId" placeholder="Your APP ID" value=""/><br/>
 <input type="button" onclick="initApp()" value="Initialise"/><br/>
-<h1>Register</h1>
-<input type="button" onclick="register()" value="Register"/><br/>
 <h1>Login</h1>
 <input type="button" onclick="login()" value="Login" id="loginButton"/><br/>
 <h1>List Groups</h1>
