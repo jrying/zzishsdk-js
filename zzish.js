@@ -623,7 +623,10 @@
                     callback(err,data);             
                 });
             });    
-        }    
+        } 
+        else {
+            callback();
+        }   
     }
 
     /**
