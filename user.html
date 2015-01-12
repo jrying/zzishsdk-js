@@ -20,12 +20,12 @@
         });
 
         function logoutUser() {
-            profileId = "";
-            $("#groupButton").hide();
+            profileId = "";            
             $("#profileIdSpan").html("You need to login");
             $("#profileNameSpan").html("You need to login");
             token = null;
-            $("#loginButton").val("Login");
+            $("#loginButtons").show();
+            $("#logoutButtons").hide();
         }
 
         function loginUser(data) {
@@ -33,8 +33,8 @@
             $("#profileIdSpan").html(profileId);
             $("#profileNameSpan").html(data.name);
             token = data.token;
-            $("#loginButton").val("Logout");
-            $("#groupButton").show();
+            $("#loginButtons").hide();
+            $("#logoutButtons").show();
         }
 
         function initApp() {
@@ -43,24 +43,37 @@
             console.log("App Initalized with id",$("#appId").val());
         }
 
-        function login() {
+        function loginPop() {
+            loginCommand("pop");
+        }
+
+        function loginRedirect() {
+            loginCommand("redirect")
+        }
+
+        function loginCommand(type) {
             if (profileId=="") {
-                Zzish.login("http://zzish.github.io/zzishsdk-js/success.html",function(err,message) {
+                Zzish.login(type,"http://zzish.github.io/zzishsdk-js/success.html",function(err,message) {
                     console.log("Logged in with status and message",err,message);
                     if (!err) {
                         loginUser(message);
                     }
                 });
             }
-            else {
+        }        
+
+        function logout() {
+            if (token!="" && token!="undefined" && profileId!="") {
                 Zzish.logout(token,function(err,message) {
                     console.log("Logged in with status and message",err,message);
                     if (!err) {
                         logoutUser();
                     }
-                });                
+                });                                
             }
-        }        
+        }
+
+
     </script>
 </head>
 
@@ -68,7 +81,13 @@
 <input type="text" id="appId" name="appId" placeholder="Your APP ID" value=""/><br/>
 <input type="button" onclick="initApp()" value="Initialise"/><br/>
 <h1>Login</h1>
-<input type="button" onclick="login()" value="Login" id="loginButton"/><br/>
+<div id="loginButtons">
+<input type="button" onclick="loginPop()" value="Login with Popup"/><br/>
+<input type="button" onclick="loginRedirect()" value="Login with Redirect"/><br/>
+</div>
+<div id="logoutButtons">
+<input type="button" onclick="logout()" value="Logout"/><br/>
+</div>
 Profile Id: <span id="profileIdSpan">You need to login to get a profile Id</span><br/>
 Profile Name: <span id="profileNameSpan">You need to login to get a profile Name</span><br/>
 </body>

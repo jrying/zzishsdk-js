@@ -1,6 +1,8 @@
 // Global Zzish object
 
 (function () {
+
+
     Zzish = {};
 
 /**** FRONT END JAVASCRIPT STUFF (WITH STATE) ***/
@@ -20,20 +22,46 @@
 /**** CONFIGURATION ******/
 
     var header = "X-ApplicationId";    
-    //var header = "Authorization";
-    //var baseUrl = "http://localhost:8080/zzishapi/api/";
-    var baseUrl = "http://api.zzish.co.uk/api/";
     var headerprefix = "";    
-    //var headerprefix = "Bearer ";
+    var baseUrl = "http://api.zzish.co.uk/api/";
+    var webUrl = "http://www.zzish.co.uk/"
+    var logEnabled = true;
+    try {
+        if (localStateSet!=undefined && localStateSet) {
+            baseUrl = "http://localhost:8080/zzishapi/api/";  
+            webUrl = "http://localhost:3000/"
+            logEnabled = false;
+        }
+    }
+    catch (err) {
+
+    }
+    try {
+        if (wso2!=undefined && wso2) {
+            header = "Authorization";
+            headerprefix = "Bearer ";
+        }
+    }
+    catch (err) {
+
+    }
     //make SDK stateless to test
     var makeStateless = false;
 
-    var webUrl = "http://www.zzish.co.uk/"
-    //var webUrl = "http://localhost:3000/"
-    
-    
-    //logEnabled
-    var logEnabled = true;
+
+    function getQueryParams(qs) {
+        qs = qs.split("+").join(" ");
+
+        var params = {}, tokens,
+            re = /[?&]?([^=]+)=([^&]*)/g;
+
+        while (tokens = re.exec(qs)) {
+            params[decodeURIComponent(tokens[1])]
+                = decodeURIComponent(tokens[2]);
+        }
+
+        return params;
+    }
 
     /**
      * Initialise Zzish instance
@@ -49,6 +77,13 @@
         }
         appId = applicationId;
     };
+
+    var params = getQueryParams(location.search);
+
+    if (params["zzishtoken"]!=undefined) {
+        Zzish.init(params["zzishtoken"]);
+    }
+
 
 /**** SERVER SIDE (NO STATE) *****/  
 
@@ -538,10 +573,11 @@
 
     /**
      * Login to Zzish
+     * @param type - "pop" (default) will do a popup. "redirect" will go to zzish and then come back
      * @param successUrl - A URL hosted on the domain you are calling so that it can monitor success (will redirect to this page after succesful login and then close the page)
      * @param callback - A callback to call when done (returns error AND (message or user))
      */
-    Zzish.login = function (successUrl,callback) {
+    Zzish.login = function (type,successUrl,callback) {
         var token_request = {
             method: "POST",
             url: baseUrl + "profiles/tokens",
