@@ -28,7 +28,7 @@
     //make SDK stateless to test
     var makeStateless = false;
 
-    var webUrl = "http://www.zzish.com/"
+    var webUrl = "http://www.zzish.co.uk/"
     //var webUrl = "http://localhost:3000/"
     
     
