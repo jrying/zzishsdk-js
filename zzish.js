@@ -25,7 +25,7 @@
     var headerprefix = "";    
     var baseUrl = "http://api.zzish.co.uk/api/";
     var webUrl = "http://www.zzish.co.uk/"
-    var logEnabled = true;
+    var logEnabled = false;
     //make SDK stateless to test
     var makeStateless = false;
 
@@ -68,15 +68,15 @@
         try {
             if (localStateSet!=undefined && localStateSet) {
                 baseUrl = "http://localhost:8080/zzishapi/api/";  
-                webUrl = "http://localhost:3000/"
-                logEnabled = false;
+                webUrl = "http://localhost:3000/";
+                logEnabled = true;
             }
         }
         catch (err) {
 
         }
         try {
-            if (wso2!=undefined && wso2) {
+            if (wso2!=undefined && wso2=="true") {
                 header = "Authorization";
                 headerprefix = "Bearer ";
             }
@@ -136,11 +136,11 @@
                         //set the current user if we don't have an error
                         currentUser = message;
                     }
-                    callCallBack(err, message, callback);
+                    callCallBack(err, {status: 200, payload: message}, callback);
                 });
             }
             else {
-                callCallBack(null, currentUser, callback);
+                callCallBack(null, {status: 200, payload: currentUser}, callback);
             }            
         }
         else {
@@ -573,6 +573,27 @@
 /**** USER STUFF ***/
 
 
+    function loadLoginWithToken(token) {
+        var url = webUrl + 'account/login?token=' + token;
+        if (type=="pop") {                    
+            var win = window.open(url, 'Zzish Login', 'width=800, height=600');
+            var pollTimer = window.setInterval(
+                function() { 
+                  try {
+                    if (win.document.URL.indexOf(webUrl) === -1) {
+                      window.clearInterval(pollTimer);
+                      win.close();
+                      Zzish.getCurrentUser(token,callback);
+                    }
+                  } catch(e) {
+                  }
+                }, 500);                    
+        }
+        else {
+            window.location.href = url; 
+        }        
+    }
+
     /**
      * Login to Zzish
      * @param type - "pop" (default) will do a popup. "redirect" will go to zzish and then come back
@@ -580,41 +601,36 @@
      * @param callback - A callback to call when done (returns error AND (message or user))
      */
     Zzish.login = function (type,successUrl,callback) {
-        var token_request = {
-            method: "POST",
-            url: baseUrl + "profiles/tokens",
-            data: { redirectURL: successUrl }
+        if (stateful()) {
+            //check if we already have a token
+            token = localStorage.getItem("zzishtoken");
         }
-        //create a token first
-        sendData(token_request, function (err, data) {
-            callCallBack(err, data, function(err,token) {
-                var url = webUrl + 'account/login?token=' + token;
-                if (type=="pop") {                    
-                    var win = window.open(url, 'Zzish Login', 'width=800, height=600');
-                    var pollTimer = window.setInterval(
-                        function() { 
-                            try {
-                                if (win.document.URL.indexOf(webUrl) === -1) {
-                                    console.log("WINDOW" + win.document.URL);
-                                    window.clearInterval(pollTimer);
-                                    win.close();
-                                    Zzish.getCurrentUser(token,callback);
-                                }
-                            } catch(e) {
-                            }
-                        }, 500);                    
-                }
-                else {
-                    window.location.href = url; 
-                }
+        if (token==undefined) {
+            var token_request = {
+                method: "POST",
+                url: baseUrl + "profiles/tokens",
+                data: { redirectURL: successUrl }
+            }
+            //create a token first
+            sendData(token_request, function (err, data) {
+                callCallBack(err, data, function(err,token) {
+                    localStorage.setItem("zzishtoken",token);
+                    loadLoginWithToken(token);
+                });
             });
-        });
+        }
+        else {
+            loadLoginWithToken(token);
+        }
     }
 
     Zzish.getCurrentUser = function(token,callback) {
         if (token==undefined) {
             //see if we can get token from query params
             token = getQueryParams()["token"];
+        }
+        if (token==undefined && stateful()) {
+            token = localStorage.getItem("zzishtoken");
         }
         if (token!=undefined) {
             var token_request = {
@@ -644,14 +660,12 @@
             method: "DELETE",
             url: baseUrl + "profiles/tokens/" + token
         }
+        if (stateful()) {
+            localStorage.removeItem("zzishtoken");
+        }
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
         });
-        request = {
-            method: "GET",
-            url: webUrl + "account/logout"
-        }
-        sendData(request);
     }
 
     /**** PROXY STUFF TO SEND DATA ***/

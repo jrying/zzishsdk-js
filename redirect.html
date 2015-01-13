@@ -8,9 +8,11 @@
     <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
 
     <script>
+        var token = null;
+
     	function loadDetails() {
     		console.log("Loading zzish");
-    		Zzish.getCurrentUser(null,function (err,data) {    			
+    		token = Zzish.getCurrentUser(null,function (err,data) {    			
     			if (!err) {
     				console.log("Data",data);
 		            $("#profileIdSpan").html(data.id);
