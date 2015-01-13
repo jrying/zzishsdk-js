@@ -593,14 +593,15 @@
                     var win = window.open(url, 'Zzish Login', 'width=800, height=600');
                     var pollTimer = window.setInterval(
                         function() { 
-                          try {
-                            if (win.document.URL.indexOf(webUrl) === -1) {
-                              window.clearInterval(pollTimer);
-                              win.close();
-                              Zzish.getCurrentUser(token,callback);
+                            try {
+                                if (win.document.URL.indexOf(webUrl) === -1) {
+                                    console.log("WINDOW" + win.document.URL);
+                                    window.clearInterval(pollTimer);
+                                    win.close();
+                                    Zzish.getCurrentUser(token,callback);
+                                }
+                            } catch(e) {
                             }
-                          } catch(e) {
-                          }
                         }, 500);                    
                 }
                 else {
@@ -648,7 +649,7 @@
         });
         request = {
             method: "GET",
-            url: webUrl + "/account/logout"
+            url: webUrl + "account/logout"
         }
         sendData(request);
     }

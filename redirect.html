@@ -12,7 +12,7 @@
     		console.log("Loading zzish");
     		Zzish.getCurrentUser(null,function (err,data) {    			
     			if (!err) {
-    				console.log("Error",data);
+    				console.log("Data",data);
 		            $("#profileIdSpan").html(data.id);
 		            $("#profileNameSpan").html(data.name);    			    				
     			}
@@ -21,6 +21,15 @@
     			}
     		})
     	}
+
+        function logout() {
+            Zzish.logout(token,function(err,message) {
+                console.log("Logged in with status and message",err,message);
+                if (!err) {
+                    window.location.href = "user.html";
+                }
+            });                                
+        }
     </script>
     <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
 </head>
@@ -29,6 +38,8 @@ Profile Id: <span id="profileIdSpan">...</span><br/>
 Profile Name: <span id="profileNameSpan">...</span><br/>
 
 <input type="button" onclick="loadDetails()" value="Load Details from Login"/><br/>
+
+<input type="button" onclick="logout()" value="Logout"/><br/>
 
 <body>
 </body>
