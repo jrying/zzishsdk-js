@@ -26,27 +26,13 @@
     var baseUrl = "http://api.zzish.co.uk/api/";
     var webUrl = "http://www.zzish.co.uk/"
     var logEnabled = true;
-    try {
-        if (localStateSet!=undefined && localStateSet) {
-            baseUrl = "http://localhost:8080/zzishapi/api/";  
-            webUrl = "http://localhost:3000/"
-            logEnabled = false;
-        }
-    }
-    catch (err) {
-
-    }
-    try {
-        if (wso2!=undefined && wso2) {
-            header = "Authorization";
-            headerprefix = "Bearer ";
-        }
-    }
-    catch (err) {
-
-    }
     //make SDK stateless to test
     var makeStateless = false;
+
+    Zzish.debugState = function(l1,w1) {
+        localStateSet = l1;
+        wso2 = w1;
+    }
 
 
     function getQueryParams() {
@@ -79,6 +65,25 @@
             }
         }
         appId = applicationId;
+        try {
+            if (localStateSet!=undefined && localStateSet) {
+                baseUrl = "http://localhost:8080/zzishapi/api/";  
+                webUrl = "http://localhost:3000/"
+                logEnabled = false;
+            }
+        }
+        catch (err) {
+
+        }
+        try {
+            if (wso2!=undefined && wso2) {
+                header = "Authorization";
+                headerprefix = "Bearer ";
+            }
+        }
+        catch (err) {
+
+        }        
     };
 
     var params = getQueryParams();
@@ -641,6 +646,11 @@
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
         });
+        request = {
+            method: "GET",
+            url: webUrl + "/account/logout"
+        }
+        sendData(request);
     }
 
     /**** PROXY STUFF TO SEND DATA ***/
