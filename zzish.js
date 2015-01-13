@@ -573,7 +573,7 @@
 /**** USER STUFF ***/
 
 
-    function loadLoginWithToken(type,token) {
+    function loadLoginWithToken(type,token,callback) {
         var url = webUrl + 'account/login?token=' + token;
         if (type=="pop") {                    
             var win = window.open(url, 'Zzish Login', 'width=800, height=600');
@@ -613,14 +613,14 @@
             }
             //create a token first
             sendData(token_request, function (err, data) {
-                callCallBack(err, data, function(err,token) {
+                    callCallBack(err, data, function(err,token) {
                     localStorage.setItem("zzishtoken",token);
-                    loadLoginWithToken(type,token);
+                    loadLoginWithToken(type,token,callback);
                 });
             });
         }
         else {
-            loadLoginWithToken(type,token);
+            loadLoginWithToken(type,token,callback);
         }
     }
 
