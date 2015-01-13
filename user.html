@@ -41,6 +41,12 @@
             Zzish.init($("#appId").val());
             init = true;
             console.log("App Initalized with id",$("#appId").val());
+            if (Zzish.getCurrentUser(function(err,data)) {
+                if (data!=null) {
+                    //we have a token
+                    loginUser(data);
+                }
+            })
         }
 
         function loginPop() {
