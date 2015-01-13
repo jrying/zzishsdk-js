@@ -12,9 +12,9 @@
 
     	function loadDetails() {
     		console.log("Loading zzish");
-    		token = Zzish.getCurrentUser(null,function (err,data) {    			
+    		Zzish.getCurrentUser(null,function (err,data) {    			
     			if (!err) {
-    				console.log("Data",data);
+                    token = data.token;
 		            $("#profileIdSpan").html(data.id);
 		            $("#profileNameSpan").html(data.name);    			    				
     			}
@@ -26,7 +26,7 @@
 
         function logout() {
             Zzish.logout(token,function(err,message) {
-                console.log("Logged in with status and message",err,message);
+                console.log("Logged out with status and message",err,message);
                 if (!err) {
                     window.location.href = "user.html";
                 }
