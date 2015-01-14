@@ -89,6 +89,7 @@
     var params = getQueryParams();
 
     if (params["zzishtoken"]!=undefined) {
+        Zzish.debugState(true,false);
         Zzish.init(params["zzishtoken"]);
     }
 
@@ -158,6 +159,20 @@
      * @return The activity zzish
      */
     Zzish.startActivity = function (userId, activityName, code, callback) {
+        return startActivity(userId,activityName,code, "", callback);
+    };
+
+    /**
+     * Start Activity with name
+     *
+     * @param userId - The userId of the user (required)
+     * @param activityName - The name of the activity (required)
+     * @param code - The Zzish Class Code when creating a class in the learning hub (optional)
+     * @param contentId - The contentId for this activity (optional)
+     * @param callback - A callback to be called after message is sent (returns error,message)
+     * @return The activity zzish
+     */
+    Zzish.startActivityForContent = function (userId, activityName, code, contentId, callback) {
         if (!currentUser || !stateful() || userId!=currentUser.id) {
             currentUser = {
                 uuid: userId
@@ -168,10 +183,11 @@
             verb: "http://activitystrea.ms/schema/1.0/start",
             activityName: activityName,
             activityUuid: aid,
-            classCode: code
+            classCode: code,
+            contentId: contentId
         }, callback);
         return aid;
-    };
+    };    
 
     /**
      * stop Activity with aid
@@ -379,7 +395,8 @@
                 extensions: {
                     "http://www.zzish.com/context/extension/groupCode": data.classCode,
                     "http://www.zzish.com/context/extension/deviceId": data.deviceId,
-                    "http://www.zzish.com/context/extension/sessionId": data.sessionId
+                    "http://www.zzish.com/context/extension/sessionId": data.sessionId,
+                    "http://www.zzish.com/context/extension/contentId": data.contentId
                 }
             }
         };
@@ -456,7 +473,6 @@
      * @param id - A unique Id for the user (required)
      * @param name - The name of the user (optional)
      * @param callback - An optional callback after user has been saved on server
-     * @return The user Id (returns the same id provided or a generated one)
      */
     Zzish.createUser = function (id, name, callback) {
         var message = {
@@ -472,6 +488,23 @@
             callCallBack(err, data, callback);
         })
     };
+
+    /**
+     * Get List of Groups for user
+     *
+     * @param id - A unique Id for the user (required)
+     * @param callback - An optional callback after user has been saved on server
+     */
+    Zzish.listGroups = function (id, callback) {
+        var request = {
+            method: "GET",
+            url: baseUrl + "profiles/"+id+"/groups",
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, callback);
+        })
+    };
+
 
 
 /**** CONTENT STUFF TO SEND DATA ***/

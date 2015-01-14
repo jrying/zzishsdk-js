@@ -38,6 +38,7 @@
         }
 
         function initApp() {
+            Zzish.debugState(true,false);
             Zzish.init($("#appId").val());
             init = true;
             console.log("App Initalized with id",$("#appId").val());
@@ -82,6 +83,17 @@
             }
         }
 
+        function groups() {
+            if (token!="" && token!="undefined" && profileId!="") {
+                Zzish.listGroups(profileId,function(err,message) {
+                    console.log("Got groups",err,message);
+                    if (!err) {
+                        $("#groupOutput").html(JSON.stringify(message));
+                    }
+                });                                
+            }            
+        }
+
 
     </script>
 </head>
@@ -95,7 +107,9 @@
 <input type="button" onclick="loginRedirect()" value="Login with Redirect"/><br/>
 </div>
 <div id="logoutButtons">
+<input type="button" onclick="groups()" value="List Groups"/><br/>
 <input type="button" onclick="logout()" value="Logout"/><br/>
+Group Output: <span id="groupOutput"></span>
 </div>
 Profile Id: <span id="profileIdSpan">You need to login to get a profile Id</span><br/>
 Profile Name: <span id="profileNameSpan">You need to login to get a profile Name</span><br/>
