@@ -266,11 +266,15 @@
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
                 if (!err) {
-                    var list = [];
-                    for (var i in data.payload.contents) {
-                        list.push(JSON.parse(data.payload.contents[i]));
+                    if(!data.payload){
+                        callback(404, null);
+                    }else{
+                        var list = [];
+                        for (var i in data.payload.contents) {
+                            list.push(JSON.parse(data.payload.contents[i]));
+                        }
+                        callback(err, {code: data.payload.code, contents: list});
                     }
-                    callback(err, {code: data.payload.code, contents: list});
                 }
                 else {
                     callback(status, message);
@@ -294,13 +298,19 @@
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
                 if (!err) {
-                    var list = [];
-                    if (data.payload) {
-                        for (var i in data.payload.contents) {
-                            list.push(JSON.parse(data.payload.contents[i]));
-                        }
+                    if(!data.payload){
+                        callback(404, null);
                     }
-                    callback(err, {code: data.payload.code, contents: list});
+                    else{
+                        var list = [];
+                        if (data.payload) {
+                            for (var i in data.payload.contents) {
+                                list.push(JSON.parse(data.payload.contents[i]));
+                            }
+                        }
+
+                        callback(err, {code: data.payload.code, contents: list});
+                    }
                 }
                 else {
                     callback(status, message);
@@ -687,7 +697,7 @@
         req.addEventListener('error', function () {
             error(this, callback, logEnabled);
         }, false);
-        req.open(request.method, request.url, logEnabled);
+        req.open(request.method, request.url, true);
         req.setRequestHeader(header, appId);
         req.setRequestHeader('Content-Type', 'application/json');
         req.send(JSON.stringify(request.data));
