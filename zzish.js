@@ -158,7 +158,7 @@
      * @return The activity zzish
      */
     Zzish.startActivity = function (userId, activityName, code, callback) {
-        if (!currentUser) {
+        if (!currentUser || !stateful()) {
             currentUser = {
                 uuid: userId
             }
