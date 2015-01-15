@@ -276,8 +276,8 @@
     Zzish.registerWithClass = function(profileId, code, callback) {
         var request = {
             method: "POST",
-            url: baseUrl + "profiles/" + profileId + "/groups/" + code + "/contents/register",
-            data: {}
+            url: baseUrl + "profiles/" + profileId + "/consumers/register",
+            data: {code: code}
         };
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
@@ -309,7 +309,7 @@
     Zzish.logIntoClass = function(scode,callback) {
         var request = {
             method: "GET",
-            url: baseUrl + "groups/" + scode + "/contents/login"
+            url: baseUrl + "profiles/contentByStudentCode/" + scode
         };
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
