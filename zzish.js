@@ -117,22 +117,22 @@
         return (typeof localStorage != 'undefined');
     }
 
-
     /**
      * Get the User (if the id is the same as the current one, returns the current user)
      *
      * @param id - A unique Id for the user (required)
      * @param name - The name of the user (optional)
+     * @param options - Additional optios for a user
      * @param callback - An optional callback after user has been saved on server
      * @return The user (returns a server user if it already exists). If it's the current User, returns that user
      */
-    Zzish.getUser = function (id, name, callback) {
+    Zzish.getUserWithOptions = function (id, name, options, callback) {
         if (id==undefined) id = v4();
         if (stateful()) {
             //that means we have a front end service so we can check state
             if (currentUser==undefined || currentUser.id != id) {
                 sessionId = v4();
-                Zzish.createUser(id,name,function(err,message) {
+                Zzish.createUserWithOptions(id,name,options,function(err,message) {
                     if (!err) {
                         //set the current user if we don't have an error
                         currentUser = message;
@@ -145,8 +145,20 @@
             }            
         }
         else {
-            Zzish.createUser(id,name,callback);
+            Zzish.createUserWithOptions(id,name,options,callback);
         }
+    };
+
+    /**
+     * Get the User (if the id is the same as the current one, returns the current user)
+     *
+     * @param id - A unique Id for the user (required)
+     * @param name - The name of the user (optional)
+     * @param callback - An optional callback after user has been saved on server
+     * @return The user (returns a server user if it already exists). If it's the current User, returns that user
+     */
+    Zzish.getUser = function (id, name, callback) {
+        Zzish.getUserWithOptions(id,name,{},callback);
     };
 
     /**
@@ -289,7 +301,8 @@
                         for (var i in data.payload.contents) {
                             list.push(JSON.parse(data.payload.contents[i]));
                         }
-                        callback(err, {code: data.payload.code, contents: list});
+                        message.contents = list;
+                        callback(err, message);
                     }
                 }
                 else {
@@ -475,10 +488,22 @@
      * @param callback - An optional callback after user has been saved on server
      */
     Zzish.createUser = function (id, name, callback) {
-        var message = {
-            uuid: id,
-            name: name
-        };
+        Zzish.createUserWithOptions(id,name,{},callback);
+    };
+
+    /**
+     * Create a user
+     *
+     * @param id - A unique Id for the user (required)
+     * @param name - The name of the user (optional)
+     * @param options - Additional options for creating a user
+     * @param callback - An optional callback after user has been saved on server
+     */
+    Zzish.createUserWithOptions = function (id, name, options, callback) {
+        var message = options;
+        if (message==undefined) message = {};
+        message.uuid = id;
+        message.name = name;
         var request = {
             method: "POST",
             url: baseUrl + "profiles",
@@ -724,12 +749,28 @@
         }
         if (logEnabled) console.log('Proxy.request ',request);
         req = new XMLHttpRequest();
-        req.addEventListener('load', function () {
+
+        if(req.addEventListener){
+            req.addEventListener('load', function () {
             response(this, callback, logEnabled);
-        }, false);
-        req.addEventListener('error', function () {
-            error(this, callback, logEnabled);
-        }, false);
+            }, false);
+
+            req.addEventListener('error', function () {
+                error(this, callback, logEnabled);
+            }, false);
+        }else{
+            //IE 8
+            req.attachEvent('onload', function () {
+            response(this, callback, logEnabled);
+            }, false);
+
+            req.attachEvent('onerror', function () {
+                error(this, callback, logEnabled);
+            }, false);
+
+        }
+
+
         req.open(request.method, request.url, true);
         req.setRequestHeader(header, appId);
         req.setRequestHeader('Content-Type', 'application/json');
