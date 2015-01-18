@@ -92,6 +92,10 @@
         Zzish.debugState(true,false);
         Zzish.init(params["zzishtoken"]);
     }
+    if (params["cancel"]!=undefined) 
+    {
+        localStorage.removeItem("zzishtoken");
+    }    
 
 
 
@@ -127,12 +131,24 @@
      * @return The user (returns a server user if it already exists). If it's the current User, returns that user
      */
     Zzish.getUserWithOptions = function (id, name, options, callback) {
+
+    };
+
+    /**
+     * Get the User (if the id is the same as the current one, returns the current user)
+     *
+     * @param id - A unique Id for the user (required)
+     * @param name - The name of the user (optional)
+     * @param callback - An optional callback after user has been saved on server
+     * @return The user (returns a server user if it already exists). If it's the current User, returns that user
+     */
+    Zzish.getUser = function (id, name, callback) {
         if (id==undefined) id = v4();
         if (stateful()) {
             //that means we have a front end service so we can check state
             if (currentUser==undefined || currentUser.id != id) {
                 sessionId = v4();
-                Zzish.createUserWithOptions(id,name,options,function(err,message) {
+                Zzish.createUser(id,name,function(err,message) {
                     if (!err) {
                         //set the current user if we don't have an error
                         currentUser = message;
@@ -145,20 +161,8 @@
             }            
         }
         else {
-            Zzish.createUserWithOptions(id,name,options,callback);
+            Zzish.createUser(id,name,callback);
         }
-    };
-
-    /**
-     * Get the User (if the id is the same as the current one, returns the current user)
-     *
-     * @param id - A unique Id for the user (required)
-     * @param name - The name of the user (optional)
-     * @param callback - An optional callback after user has been saved on server
-     * @return The user (returns a server user if it already exists). If it's the current User, returns that user
-     */
-    Zzish.getUser = function (id, name, callback) {
-        Zzish.getUserWithOptions(id,name,{},callback);
     };
 
     /**
@@ -171,7 +175,7 @@
      * @return The activity zzish
      */
     Zzish.startActivity = function (userId, activityName, code, callback) {
-        return startActivity(userId,activityName,code, "", callback);
+        return startActivityWithOptions(userId,activityName,code,undefined, callback);
     };
 
     /**
@@ -180,24 +184,31 @@
      * @param userId - The userId of the user (required)
      * @param activityName - The name of the activity (required)
      * @param code - The Zzish Class Code when creating a class in the learning hub (optional)
-     * @param contentId - The contentId for this activity (optional)
+     * @param options - Additional options
      * @param callback - A callback to be called after message is sent (returns error,message)
      * @return The activity zzish
      */
-    Zzish.startActivityForContent = function (userId, activityName, code, contentId, callback) {
+    Zzish.startActivityWithOptions = function (userId, activityName, code, options, callback) {
         if (!currentUser || !stateful() || userId!=currentUser.id) {
             currentUser = {
                 uuid: userId
             }
         };
         aid = v4();
-        sendMessage({
+        var definition = options.definition;
+        if (definition==undefined) {}
+        definition.type = activityName;
+        var message = {
             verb: "http://activitystrea.ms/schema/1.0/start",
-            activityName: activityName,
             activityUuid: aid,
             classCode: code,
-            contentId: contentId
-        }, callback);
+            activity_definition: definition,
+            contentId: options.contentId
+        };
+        if (options.contentId) {
+            message.contentId = options.contentId;
+        }
+        sendMessage(message, callback);
         return aid;
     };    
 
@@ -313,44 +324,6 @@
     };
 
     /**
-     * Login a User using student code and return list of contents
-     *
-     * @param scode - Zzish Student Code
-     * @param callback - A callback to be called after message is sent (returns error,message)
-     *
-     */
-    Zzish.logIntoClass = function(scode,callback) {
-        var request = {
-            method: "GET",
-            url: baseUrl + "profiles/contentByStudentCode/" + scode
-        };
-        sendData(request, function (err, data) {
-            callCallBack(err, data, function (status, message) {
-                if (!err) {
-                    if(!data.payload){
-                        callback(404, null);
-                    }
-                    else{
-                        var list = [];
-                        if (data.payload) {
-                            for (var i in data.payload.contents) {
-                                list.push(JSON.parse(data.payload.contents[i]));
-                            }
-                        }
-
-                        callback(err, {code: data.payload.code, contents: list});
-                    }
-                }
-                else {
-                    callback(status, message);
-                }
-            });
-        })
-    };
-
-
-
-    /**
      * send message to REST API
      *
      * @param data - A partial tincan statement
@@ -369,7 +342,6 @@
             'Content-Type': 'application/json'
         };
         headers[header] = headerprefix + appId;
-
         if (logEnabled) console.log("Sending" + JSON.stringify(message));
         var request = {
             method: "POST",
@@ -387,7 +359,6 @@
      * @returns partially built TinCan message
      */
     var buildSimulationMessage = function (data) {
-
         var message = {
             actor: {
                 account: {
@@ -399,9 +370,7 @@
                 id: data.verb
             },
             object: {
-                definition: {
-                    type: data.activityName
-                }
+                definition: data.activity_definition
             },
             id: data.activityUuid,
             context: {
@@ -413,6 +382,12 @@
                 }
             }
         };
+        message.object = {
+            definition: {}
+        };        
+        if (data.activity_definition) {
+            message.object.definition = data.activity_definition;
+        }
         if (!!data.attributes) {
             var found = false;
             for (i in data.attributes) {
@@ -481,14 +456,27 @@
 /**** BACK END USER STUFF ***/
 
     /**
-     * Create a user
+     * Authenticate user based on name and classcode
      *
      * @param id - A unique Id for the user (required)
-     * @param name - The name of the user (optional)
+     * @param name - The name of the user (required)
+     * @param code - The Zzish Class code (required)
      * @param callback - An optional callback after user has been saved on server
      */
-    Zzish.createUser = function (id, name, callback) {
-        Zzish.createUserWithOptions(id,name,{},callback);
+    Zzish.authUser = function (id, name, code, callback) {
+        var message = {
+            uuid : id,
+            username : name,
+            passwordText: code
+        };
+        var request = {
+            method: "POST",
+            url: baseUrl + "profiles/auth",
+            data: message
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, callback);
+        })
     };
 
     /**
@@ -496,14 +484,13 @@
      *
      * @param id - A unique Id for the user (required)
      * @param name - The name of the user (optional)
-     * @param options - Additional options for creating a user
      * @param callback - An optional callback after user has been saved on server
      */
-    Zzish.createUserWithOptions = function (id, name, options, callback) {
-        var message = options;
-        if (message==undefined) message = {};
-        message.uuid = id;
-        message.name = name;
+    Zzish.createUser = function (id, name, callback) {
+        var message = {
+            uuid : id,
+            name : name
+        };
         var request = {
             method: "POST",
             url: baseUrl + "profiles",
@@ -513,6 +500,7 @@
             callCallBack(err, data, callback);
         })
     };
+
 
     /**
      * Get List of Groups for user
