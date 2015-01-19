@@ -195,7 +195,11 @@
             }
         };
         aid = v4();
-        var definition = options.definition;
+        if(options)
+            definition = options.definition;
+        else {
+            definition = {};
+        }    
         if (definition==undefined) {}
         definition.type = activityName;
         var message = {
