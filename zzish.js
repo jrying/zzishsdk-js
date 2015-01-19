@@ -175,7 +175,7 @@
      * @return The activity zzish
      */
     Zzish.startActivity = function (userId, activityName, code, callback) {
-        return startActivityWithOptions(userId,activityName,code,undefined, callback);
+        return Zzish.startActivityWithOptions(userId,activityName,code,undefined, callback);
     };
 
     /**
