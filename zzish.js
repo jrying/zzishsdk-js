@@ -175,7 +175,7 @@
      * @return The activity zzish
      */
     Zzish.startActivity = function (userId, activityName, code, callback) {
-        return Zzish.startActivityWithOptions(userId,activityName,code,undefined, callback);
+        return Zzish.startActivityWithOptions(userId,activityName,code,{}, callback);
     };
 
     /**
@@ -206,9 +206,8 @@
             verb: "http://activitystrea.ms/schema/1.0/start",
             activityUuid: aid,
             classCode: code,
-            activity_definition: definition,
-            contentId: options.contentId
-        };
+            activity_definition: definition            
+        };        
         if (options.contentId) {
             message.contentId = options.contentId;
         }
