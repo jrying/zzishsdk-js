@@ -195,12 +195,11 @@
             }
         };
         aid = v4();
-        if(options)
+        definition = {};
+        if(options) {
             definition = options.definition;
-        else {
-            definition = {};
-        }    
-        if (definition==undefined) {}
+        }
+        if (definition==undefined) definition = {};
         definition.type = activityName;
         var message = {
             verb: "http://activitystrea.ms/schema/1.0/start",
