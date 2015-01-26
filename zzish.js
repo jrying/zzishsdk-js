@@ -458,6 +458,26 @@
 /**** BACK END USER STUFF ***/
 
     /**
+     * Returns true if it's a valid class code (not necessarily whether it exists)
+     *
+     * @param code - The Zzish Class code (required)
+     */
+    Zzish.validateClassCode = function (code) {
+        if (code!=undefined && code.length>1) {
+            var charLast = code.slice(-1);           
+            var total = 0; 
+            for (counter=0;counter<code.length-1;counter++) {
+                total+=code.charCodeAt(counter);
+            }
+            total = total%10;
+            if (charLast==total) {
+                return true;
+            }
+        }
+        return false;      
+    };
+
+    /**
      * Authenticate user based on name and classcode
      *
      * @param id - A unique Id for the user (required)

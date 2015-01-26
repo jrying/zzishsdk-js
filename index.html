@@ -44,15 +44,32 @@
         }
 
         function startActivity() {
-            if (init) {            
-                activityId = Zzish.startActivity($("#userId").val(),$("#aname").val(),$("#groupCode").val(),function(err,message) {
-                    if (err) {
-                        console.log("Activity " + message.uuid + "started");        
+            if (init) { 
+                var validRequest = true; 
+                if ($("#groupCode").val()!="") {
+                    if (Zzish.validateClassCode($("#groupCode").val())) {
+                        validRequest = true;
                     }
                     else {
-                        console.log("Error starting" + err)
+                        validRequest = false;
                     }
-                });
+                }
+                else {
+                    validRequest = true;
+                }   
+                if (validRequest) {
+                    activityId = Zzish.startActivity($("#userId").val(),$("#aname").val(),$("#groupCode").val(),function(err,message) {
+                        if (err) {
+                            console.log("Activity " + message.uuid + "started");        
+                        }
+                        else {
+                            console.log("Error starting" + err)
+                        }
+                    });
+                }
+                else {
+                    console.log("Invalid Request");
+                }
             }
             else {
                 alert ("Please init with your APP_ID from http://www.zzish.co.uk/developer/")
