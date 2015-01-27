@@ -200,7 +200,9 @@
             definition = options.definition;
         }
         if (definition==undefined) definition = {};
-        definition.type = activityName;
+        if (definition.type==undefined) {
+            definition.type = activityName;    
+        }        
         var message = {
             verb: "http://activitystrea.ms/schema/1.0/start",
             activityUuid: aid,

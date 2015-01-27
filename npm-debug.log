@@ -1,0 +1,99 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'node', '/usr/local/bin/npm', 'publish', './' ]
+2 info using npm@2.1.9
+3 info using node@v0.10.31
+4 verbose node symlink /usr/local/bin/node
+5 verbose publish [ './' ]
+6 silly cache add args [ './', null ]
+7 verbose cache add spec ./
+8 silly cache add parsed spec { raw: './',
+8 silly cache add   scope: null,
+8 silly cache add   name: null,
+8 silly cache add   rawSpec: './',
+8 silly cache add   spec: '/Users/samirseetal/Developer/code/zzishsdk-js',
+8 silly cache add   type: 'directory' }
+9 verbose tar pack [ '/Users/samirseetal/.npm/zzishsdk/0.1.2/package.tgz',
+9 verbose tar pack   '/Users/samirseetal/Developer/code/zzishsdk-js' ]
+10 verbose tarball /Users/samirseetal/.npm/zzishsdk/0.1.2/package.tgz
+11 verbose folder /Users/samirseetal/Developer/code/zzishsdk-js
+12 info prepublish zzishsdk@0.1.2
+13 verbose addLocalTarball adding from inside cache /Users/samirseetal/.npm/zzishsdk/0.1.2/package.tgz
+14 silly cache afterAdd zzishsdk@0.1.2
+15 verbose afterAdd /Users/samirseetal/.npm/zzishsdk/0.1.2/package/package.json not in flight; writing
+16 verbose afterAdd /Users/samirseetal/.npm/zzishsdk/0.1.2/package/package.json written
+17 silly publish { name: 'zzishsdk',
+17 silly publish   version: '0.1.2',
+17 silly publish   description: 'SDK for Zzish API',
+17 silly publish   main: 'zzish.js',
+17 silly publish   scripts: { test: 'echo "Error: no test specified" && exit 1' },
+17 silly publish   repository:
+17 silly publish    { type: 'git',
+17 silly publish      url: 'https://github.com/zzishdev/zzishsdk-js.git' },
+17 silly publish   keywords: [ 'zzish', 'api', 'sdk' ],
+17 silly publish   author:
+17 silly publish    { name: 'Zzish Developers',
+17 silly publish      email: 'developers@zzish.com',
+17 silly publish      url: 'http://www.zzish.com' },
+17 silly publish   license: 'MIT',
+17 silly publish   bugs: { url: 'https://github.com/zzishdev/zzishsdk-js/issues' },
+17 silly publish   homepage: 'https://github.com/zzishdev/zzishsdk-js',
+17 silly publish   readme: 'Zzish JS Sample\n======================\n\nA simple Example app to allow you to test out the different calls that the Zzish SDK provides.\n\nTry it out via GitHub pages: [Zzish Demo Javascript App](http://zzishdev.github.io/zzishsdk-js)\n\nYou will need to generate an applicaiton id by siging up at the [Zzish Developer](http://www.zzish.co.uk/developer) website. \n\nYou will also need to create a class on the [Zzish Learning Hub](http://www.zzish.co.uk/learning-hub) website. After entering the class code (when creating an activity), you will be able to view realtime data on the live dashboard.\n\nFeedback of all shapes and sizes welcome via issues or (email)[mailto:developers@zzish.com].\n\nThanks for your interest\n\n-*Zzish*',
+17 silly publish   readmeFilename: 'README.md',
+17 silly publish   gitHead: '07280f958ab8992687589774ab6099cd526da361',
+17 silly publish   _id: 'zzishsdk@0.1.2',
+17 silly publish   _shasum: '793a18914ae45cc6beb1876ef2787ad1ae00f08a',
+17 silly publish   _from: '.' }
+18 silly mapToRegistry name zzishsdk
+19 silly mapToRegistry using default registry
+20 silly mapToRegistry registry https://registry.npmjs.org/
+21 silly mapToRegistry uri https://registry.npmjs.org/zzishsdk
+22 verbose publish registryBase https://registry.npmjs.org/
+23 silly publish uploading /Users/samirseetal/.npm/zzishsdk/0.1.2/package.tgz
+24 verbose request uri https://registry.npmjs.org/zzishsdk
+25 verbose request sending authorization for write operation
+26 info attempt registry request try #1 at 16:43:30
+27 verbose request id 8c028c3dfaef5e4b
+28 http request PUT https://registry.npmjs.org/zzishsdk
+29 http 403 https://registry.npmjs.org/zzishsdk
+30 verbose headers { date: 'Tue, 27 Jan 2015 16:43:31 GMT',
+30 verbose headers   server: 'CouchDB/1.5.0 (Erlang OTP/R16B03)',
+30 verbose headers   'content-type': 'application/json',
+30 verbose headers   'cache-control': 'max-age=60',
+30 verbose headers   'content-length': '3085',
+30 verbose headers   'accept-ranges': 'bytes',
+30 verbose headers   via: '1.1 varnish',
+30 verbose headers   'x-served-by': 'cache-lhr6324-LHR',
+30 verbose headers   'x-cache': 'MISS',
+30 verbose headers   'x-cache-hits': '0',
+30 verbose headers   'x-timer': 'S1422377011.277674,VS0,VE421',
+30 verbose headers   'keep-alive': 'timeout=10, max=50',
+30 verbose headers   connection: 'Keep-Alive' }
+31 verbose request invalidating /Users/samirseetal/.npm/registry.npmjs.org/zzishsdk on PUT
+32 error publish Failed PUT 403
+33 verbose stack Error: forbidden cannot modify pre-existing version: 0.1.2
+33 verbose stack old={"name":"zzishsdk","version":"0.1.2","description":"SDK for Zzish API","main":"zzish.js","scripts":{"test":"echo \"Error: no test specified\" && exit 1"},"repository":{"type":"git","url":"https://github.com/zzishdev/zzishsdk-js.git"},"keywords":["zzish","api","sdk"],"author":{"name":"Zzish Developers","email":"developers@zzish.com","url":"http://www.zzish.com"},"license":"MIT","bugs":{"url":"https://github.com/zzishdev/zzishsdk-js/issues"},"homepage":"https://github.com/zzishdev/zzishsdk-js","gitHead":"07280f958ab8992687589774ab6099cd526da361","_id":"zzishsdk@0.1.2","_shasum":"793a18914ae45cc6beb1876ef2787ad1ae00f08a","_from":".","_npmVersion":"2.1.9","_nodeVersion":"0.10.31","_npmUser":{"name":"zzishdev","email":"developers@zzish.com"},"maintainers":[{"name":"zzishdev","email":"developers@zzish.com"}],"dist":{"shasum":"793a18914ae45cc6beb1876ef2787ad1ae00f08a","tarball":"http://registry.npmjs.org/zzishsdk/-/zzishsdk-0.1.2.tgz"}}
+33 verbose stack new={"name":"zzishsdk","version":"0.1.2","description":"SDK for Zzish API","main":"zzish.js","scripts":{"test":"echo \"Error: no test specified\" && exit 1"},"repository":{"type":"git","url":"https://github.com/zzishdev/zzishsdk-js.git"},"keywords":["zzish","api","sdk"],"author":{"name":"Zzish Developers","email":"developers@zzish.com","url":"http://www.zzish.com"},"license":"MIT","bugs":{"url":"https://github.com/zzishdev/zzishsdk-js/issues"},"homepage":"https://github.com/zzishdev/zzishsdk-js","readme":"Zzish JS Sample\u000a======================\u000a\u000aA simple Example app to allow you to test out the different calls that the Zzish SDK provides.\u000a\u000aTry it out via GitHub pages: [Zzish Demo Javascript App](http://zzishdev.github.io/zzishsdk-js)\u000a\u000aYou will need to generate an applicaiton id by siging up at the [Zzish Developer](http://www.zzish.co.uk/developer) website. \u000a\u000aYou will also need to create a class on the [Zzish Learning Hub](http://www.zzish.co.uk/learning-hub) website. After entering the class code (when creating an activity), you will be able to view realtime data on the live dashboard.\u000a\u000aFeedback of all shapes and sizes welcome via issues or (email)[mailto:developers@zzish.com].\u000a\u000aThanks for your interest\u000a\u000a-*Zzish*","readmeFilename":"README.md","gitHead":"07280f958ab8992687589774ab6099cd526da361","_id":"zzishsdk@0.1.2","_shasum":"793a18914ae45cc6beb1876ef2787ad1ae00f08a","_from":".","_npmVersion":"2.1.9","_nodeVersion":"0.10.31","_npmUser":{"name":"zzishdev","email":"developers@zzish.com"},"maintainers":[{"name":"zzishdev","email":"developers@zzish.com"}],"dist":{"shasum":"793a18914ae45cc6beb1876ef2787ad1ae00f08a","tarball":"http://registry.npmjs.org/zzishsdk/-/zzishsdk-0.1.2.tgz"}}: zzishsdk
+33 verbose stack     at CachingRegistryClient.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:242:14)
+33 verbose stack     at Request._callback (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/lib/request.js:172:14)
+33 verbose stack     at Request.self.callback (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/node_modules/request/request.js:372:22)
+33 verbose stack     at Request.emit (events.js:98:17)
+33 verbose stack     at Request.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/node_modules/request/request.js:1317:14)
+33 verbose stack     at Request.emit (events.js:117:20)
+33 verbose stack     at IncomingMessage.<anonymous> (/usr/local/lib/node_modules/npm/node_modules/npm-registry-client/node_modules/request/request.js:1265:12)
+33 verbose stack     at IncomingMessage.emit (events.js:117:20)
+33 verbose stack     at _stream_readable.js:943:16
+33 verbose stack     at process._tickCallback (node.js:419:13)
+34 verbose statusCode 403
+35 verbose pkgid zzishsdk
+36 verbose cwd /Users/samirseetal/Developer/code/zzishsdk-js
+37 error Darwin 14.0.0
+38 error argv "node" "/usr/local/bin/npm" "publish" "./"
+39 error node v0.10.31
+40 error npm  v2.1.9
+41 error code E403
+42 error forbidden cannot modify pre-existing version: 0.1.2
+42 error old={"name":"zzishsdk","version":"0.1.2","description":"SDK for Zzish API","main":"zzish.js","scripts":{"test":"echo \"Error: no test specified\" && exit 1"},"repository":{"type":"git","url":"https://github.com/zzishdev/zzishsdk-js.git"},"keywords":["zzish","api","sdk"],"author":{"name":"Zzish Developers","email":"developers@zzish.com","url":"http://www.zzish.com"},"license":"MIT","bugs":{"url":"https://github.com/zzishdev/zzishsdk-js/issues"},"homepage":"https://github.com/zzishdev/zzishsdk-js","gitHead":"07280f958ab8992687589774ab6099cd526da361","_id":"zzishsdk@0.1.2","_shasum":"793a18914ae45cc6beb1876ef2787ad1ae00f08a","_from":".","_npmVersion":"2.1.9","_nodeVersion":"0.10.31","_npmUser":{"name":"zzishdev","email":"developers@zzish.com"},"maintainers":[{"name":"zzishdev","email":"developers@zzish.com"}],"dist":{"shasum":"793a18914ae45cc6beb1876ef2787ad1ae00f08a","tarball":"http://registry.npmjs.org/zzishsdk/-/zzishsdk-0.1.2.tgz"}}
+42 error new={"name":"zzishsdk","version":"0.1.2","description":"SDK for Zzish API","main":"zzish.js","scripts":{"test":"echo \"Error: no test specified\" && exit 1"},"repository":{"type":"git","url":"https://github.com/zzishdev/zzishsdk-js.git"},"keywords":["zzish","api","sdk"],"author":{"name":"Zzish Developers","email":"developers@zzish.com","url":"http://www.zzish.com"},"license":"MIT","bugs":{"url":"https://github.com/zzishdev/zzishsdk-js/issues"},"homepage":"https://github.com/zzishdev/zzishsdk-js","readme":"Zzish JS Sample\u000a======================\u000a\u000aA simple Example app to allow you to test out the different calls that the Zzish SDK provides.\u000a\u000aTry it out via GitHub pages: [Zzish Demo Javascript App](http://zzishdev.github.io/zzishsdk-js)\u000a\u000aYou will need to generate an applicaiton id by siging up at the [Zzish Developer](http://www.zzish.co.uk/developer) website. \u000a\u000aYou will also need to create a class on the [Zzish Learning Hub](http://www.zzish.co.uk/learning-hub) website. After entering the class code (when creating an activity), you will be able to view realtime data on the live dashboard.\u000a\u000aFeedback of all shapes and sizes welcome via issues or (email)[mailto:developers@zzish.com].\u000a\u000aThanks for your interest\u000a\u000a-*Zzish*","readmeFilename":"README.md","gitHead":"07280f958ab8992687589774ab6099cd526da361","_id":"zzishsdk@0.1.2","_shasum":"793a18914ae45cc6beb1876ef2787ad1ae00f08a","_from":".","_npmVersion":"2.1.9","_nodeVersion":"0.10.31","_npmUser":{"name":"zzishdev","email":"developers@zzish.com"},"maintainers":[{"name":"zzishdev","email":"developers@zzish.com"}],"dist":{"shasum":"793a18914ae45cc6beb1876ef2787ad1ae00f08a","tarball":"http://registry.npmjs.org/zzishsdk/-/zzishsdk-0.1.2.tgz"}}: zzishsdk
+43 error If you need help, you may report this error at:
+43 error     <http://github.com/npm/npm/issues>
+44 verbose exit [ 1, true ]
