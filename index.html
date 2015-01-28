@@ -12,31 +12,45 @@
     <script src="zzish.js"></script>
     <script>
         var activityId; 
-            var init = false;
+        var init = false;
+        var wso2Enabled = false;
+        var localEnabled = false;        
+        //set to true to use a stateless version of the SDK
+        var stateless = false;
+        var deviceId = "DEVICE_ID";
+        var sessionId = "SESSION_ID";
 
         function initApp() {
-            Zzish.init($("#appId").val());
-            init = true;
-            console.log("App Initalized with id",$("#appId").val());
+            if (!init) {
+                if ($("#appId").val()!="") {
+                    Zzish.debugState(localEnabled,wso2Enabled);
+                    Zzish.init($("#appId").val());
+                    init = true;    
+                    console.log("App Initalized with id",$("#appId").val());
+                }
+                else {
+                    alert ("Please enter your API KEY from http://www.zzish.co.uk/developer/")
+                }
+            }
+            return init;
         }
 
-        function stateless() {
-            if (init) {
-                Zzish.initState("123456","s2342523523").getUser(1231313,"234243234",function(err,message) {
-                    console.log("User" + err + " message" + message);
-                })            
-            }
-            else {
-                alert ("Please init with your APP_ID from http://www.zzish.co.uk/developer/")
-            }
-        }
 
         function getUser() {
-            if (init) {
-                Zzish.getUser($("#userId").val(),$("#name").val(),function(err,message) {
-                    console.log("User created with status" + err + "for id" + message.uuid);    
-                });
-                
+            if (initApp()) {
+                    var command = Zzish;
+                    if (stateless) {
+                        command = Zzish.initState(deviceId,sessionId);
+                    }
+                    command.getUser($("#userId").val(),$("#name").val(),function(err,message) {
+                        if (err) {
+                            console.log("User " + message.uuid + "created");        
+                        }
+                        else {
+                            console.log("Error starting" + err)
+                        }                        
+                    }
+                });                
             }
             else {
                 alert ("Please init with your APP_ID from http://www.zzish.co.uk/developer/")
@@ -44,7 +58,7 @@
         }
 
         function startActivity() {
-            if (init) { 
+            if (initApp()) { 
                 var validRequest = true; 
                 if ($("#groupCode").val()!="") {
                     if (Zzish.validateClassCode($("#groupCode").val())) {
@@ -78,7 +92,7 @@
         }
 
         function logAction() {
-            if (init) {                        
+            if (initApp()) {                        
                 Zzish.logAction(activityId,$("#actname").val(),$("#response").val(),$("#Score").val(),$("#correct").val(),$("#Duration").val(),$("#Attempts").val(),$("#attributes").val(),function(err,message) {
                     if (err) {
                         console.log("logAction " + message.uuid + "started");        
@@ -94,7 +108,7 @@
         }
 
         function stopActivity() {
-            if (init) {             
+            if (initApp()) {             
                 Zzish.stopActivity(activityId,$("#aattributes").val(),function(err,message) {
                     if (err) {
                         console.log("Activity " + message.uuid + "started");        
@@ -110,7 +124,7 @@
         }   
 
         function cancelActivity() {
-            if (init) {                        
+            if (initApp()) {                        
                 Zzish.cancelActivity(activityId,function(err,message) {
                     if (err) {
                         console.log("Activity " + message.uuid + "cancelled");        
@@ -128,12 +142,11 @@
 </head>
 
 <body>
-<input type="text" id="appId" name="appId" placeholder="Your API Key" value=""/><br/>
-<input type="button" onclick="initApp()" value="Initialise"/><br/>
+<input type="text" id="appId" name="appId" placeholder="Your API Key" value="" size="40"/><br/>
 <h1>Create user</h1>
 <input type="text" id="userId" name="userId" placeholder="userId" value=""/><br/>
 <input type="text" id="name" name="name" placeholder="Name" value=""/><br/>
-<input type="button" onclick="stateless()" value="Create User"/><br/>
+<input type="button" onclick="getUser()" value="Create User"/><br/>
 <br/>
 <h1>Start Activity</h1>
 <input type="text" id="groupCode" name="groupCode" placeholder="Class code" value=""/><br/>

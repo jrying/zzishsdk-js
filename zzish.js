@@ -548,7 +548,8 @@
 
     /**
      * Save a Zzish content object
-     * @param id - The id of the profile to which to save the content for
+     * @param profileId - The id of the profile to which to save the content for     
+     * @param id - The id of the content
      * @param name - The id of the profile to which to save the content for
      * @param content - The JSON object to save
      * @param callback - An optional callback to call when done (returns error,message)
@@ -563,6 +564,22 @@
             method: "POST",
             url: baseUrl + "profiles/" + profileId + "/contents/" + id,
             data: data
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, callback);
+        });
+    };
+
+    /**
+     * Delete a Zzish content object
+     * @param profileId - The id of the profile to which to save the content for     
+     * @param id - The id of the content
+     * @param callback - An optional callback to call when done (returns error,message)
+     */
+    Zzish.deleteContent = function (profileId, id, callback) {
+        var request = {
+            method: "DELETE",
+            url: baseUrl + "profiles/" + profileId + "/contents/" + id
         };
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);

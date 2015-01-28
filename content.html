@@ -14,62 +14,71 @@
         var userId;
         var init = false;
 
+        var wso2Enabled = false;
+        var localEnabled = false;
+
+
         function initApp() {
-            Zzish.init($("#appId").val());
-            init = true;
-            console.log("App Initalized with id",$("#appId").val());
+            if (!init) {
+                if ($("#appId").val()!="") {                    
+                    Zzish.debugState(localEnabled,wso2Enabled);
+                    Zzish.init($("#appId").val());
+                    init = true;    
+                    console.log("App Initalized with id",$("#appId").val());
+                }
+                else {
+                    alert ("Please enter your API KEY from http://www.zzish.co.uk/developer/")
+                }
+            }
+            return init;
         }
 
         function createUser() {
-            if (init) {
-                userId = Zzish.getUser($("#userId").val(),$("#name").val(),function(err,message) {
-                    console.log("User created with status" + err);    
+            if (initApp()) {
+                Zzish.getUser($("#userId").val(),$("#name").val(),function(err,message) {
+                    userId = message.uuid;
+                    console.log("User created with status" + message.uuid);    
                 });
                 
-            }
-            else {
-                alert ("Please init with your APP_ID from http://www.zzish.co.uk/developer/")
             }
         }
 
         function postContent() {
-            if (init) {            
+            if (initApp()) {            
                 //postContent = function(profileId,id,name,content,callback)
                 var JSON_val = JSON.parse($("#cjson").val());
                 Zzish.postContent(userId,$("#cid").val(),$("#cname").val(),JSON_val,function(err,message) {
                     console.log("Content created with status" + err);    
                 });
             }
-            else {
-                alert ("Please init with your APP_ID from http://www.zzish.co.uk/developer/")
-            }
-            
         }
 
         function getContent() {
-            if (init) {                        
+            if (initApp()) {                        
                 Zzish.getContent(userId,$("#gcid").val(),function(err,message) {
                     $("#getContentOutput").html(JSON.stringify(message));
                 });
             }
-            else {
-                alert ("Please init with your APP_ID from http://www.zzish.co.uk/developer/")
-            }
         }
 
         function listContent() {
-            if (init) {     
+            if (initApp()) {     
                 Zzish.listContent(userId,function(err,message) {
                     $("#listContentOutput").html(JSON.stringify(message));
                 });
             }
-            else {
-                alert ("Please init with your APP_ID from http://www.zzish.co.uk/developer/")
+        } 
+
+        function deleteContent() {
+            if (initApp()) {     
+                Zzish.deleteContent(userId,$("#dcid").val(),function(err,message) {
+                    console.log("")
+                });
             }
         } 
 
         function publishContentToGroup() {
-            if (init) {     
+            if (initApp()) {     
                 Zzish.publishContent(userId,$("#pemail").val(),$("#pid").val(),$("#pcode").val(),function(err,message) {
                     $("#publishContentOutput").html(JSON.stringify(message));
                 });
@@ -82,8 +91,7 @@
 </head>
 
 <body>
-<input type="text" id="appId" name="appId" placeholder="Your API Key" value=""/><br/>
-<input type="button" onclick="initApp()" value="Initialise"/><br/>
+<input type="text" id="appId" name="appId" placeholder="Your API Key" value="" size="40"/><br/>
 <h1>Create user</h1>
 <input type="text" id="userId" name="userId" placeholder="userId" value=""/><br/>
 <input type="text" id="name" name="name" placeholder="Name" value=""/><br/>
@@ -92,7 +100,7 @@
 <h1>Create Content</h1>
 <input type="text" id="cid" name="cid" placeholder="Content Id" value=""/><br/>
 <input type="text" id="cname" name="cname" placeholder="Content Name" value=""/><br/>
-<input type="text" id="cjson" name="cjson" placeholder="Content JSON" value=""/><br/>
+<textarea id="cjson" name="cjson" placeholder="Content JSON" rows="10" cols="40"></textarea><br/>
 <input type="button" onclick="postContent()" value="Create Content"/><br/>
 <h1>Get Content</h1>
 <input type="text" id="gcid" name="gcid" placeholder="Content Id" value=""/><br/>
@@ -112,5 +120,9 @@
 <input type="button" onclick="publishContent()" value="Publish Content"/><br/>
 <h2>Output</h2>
 <div id="publishContentOutput"></div>
+<h1>Delete Content</h1>
+<input type="text" id="dcid" name="dcid" placeholder="Content Id" value=""/><br/>
+<input type="button" onclick="deleteContent()" value="Delete Content"/><br/>
+
 </body>
 </html>

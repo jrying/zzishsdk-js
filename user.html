@@ -14,6 +14,8 @@
         var profileId;
         var init = false;
         var token = null;
+        var wso2Enabled = false;
+        var localEnabled = false;
 
         $(document).ready(function() {
             logoutUser();
@@ -38,24 +40,36 @@
         }
 
         function initApp() {
-            Zzish.debugState(true,false);
-            Zzish.init($("#appId").val());
-            init = true;
-            console.log("App Initalized with id",$("#appId").val());
-            Zzish.getCurrentUser(null,function(err,data) {
-                if (data!=null) {
-                    //we have a token
-                    loginUser(data);
+            if (!init) {
+                if ($("#appId").val()!="") {
+                    Zzish.debugState(localEnabled,wso2Enabled);
+                    Zzish.init($("#appId").val());
+                    init = true;    
+                    console.log("App Initalized with id",$("#appId").val());
+                    Zzish.getCurrentUser(null,function(err,data) {
+                        if (data!=null) {
+                            //we have a token
+                            loginUser(data);
+                        }
+                    })                
                 }
-            })
+                else {
+                    alert ("Please enter your API KEY from http://www.zzish.co.uk/developer/")
+                }
+            }
+            return init;
         }
 
         function loginPop() {
-            loginCommand("pop","success.html");
+            if (initApp()) {
+                loginCommand("pop","success.html");    
+            }            
         }
 
         function loginRedirect() {
-            loginCommand("redirect","redirect.html")
+            if (initApp()) {
+                loginCommand("redirect","redirect.html")
+            }
         }
 
         function loginCommand(type,redirectURL) {
@@ -73,25 +87,29 @@
         }        
 
         function logout() {
-            if (token!="" && token!="undefined" && profileId!="") {
-                Zzish.logout(token,function(err,message) {
-                    console.log("Logged in with status and message",err,message);
-                    if (!err) {
-                        logoutUser();
-                    }
-                });                                
+            if (initApp()) {
+                if (token!="" && token!="undefined" && profileId!="") {
+                    Zzish.logout(token,function(err,message) {
+                        console.log("Logged in with status and message",err,message);
+                        if (!err) {
+                            logoutUser();
+                        }
+                    });                                
+                }
             }
         }
 
         function groups() {
-            if (token!="" && token!="undefined" && profileId!="") {
-                Zzish.listGroups(profileId,function(err,message) {
-                    console.log("Got groups",err,message);
-                    if (!err) {
-                        $("#groupOutput").html(JSON.stringify(message));
-                    }
-                });                                
-            }            
+            if (initApp()) {            
+                if (token!="" && token!="undefined" && profileId!="") {
+                    Zzish.listGroups(profileId,function(err,message) {
+                        console.log("Got groups",err,message);
+                        if (!err) {
+                            $("#groupOutput").html(JSON.stringify(message));
+                        }
+                    });                                
+                }            
+            }
         }
 
 
@@ -99,8 +117,7 @@
 </head>
 
 <body>
-<input type="text" id="appId" name="appId" placeholder="Your API Key" value=""/><br/>
-<input type="button" onclick="initApp()" value="Initialise"/><br/>
+<input type="text" id="appId" name="appId" placeholder="Your API Key" value="" size="40"/><br/>
 <h1>Login</h1>
 <div id="loginButtons">
 <input type="button" onclick="loginPop()" value="Login with Popup"/><br/>
