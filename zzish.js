@@ -47,6 +47,8 @@
             }
             else if (location.hash!="") {
                 qs = location.hash;
+                indexOf = qs.indexOf("?");
+                qs = qs.substring(indexOf+1);
             }
             qs = qs.split("+").join(" ");
             while (tokens = re.exec(qs)) {
