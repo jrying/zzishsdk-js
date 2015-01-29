@@ -28,6 +28,8 @@
     var logEnabled = false;
     //make SDK stateless to test
     var makeStateless = false;
+    var defaultLocalEnabled = false;
+    var defaultWso2Enabled = false;
 
     Zzish.debugState = function(l1,w1) {
         localStateSet = l1;
@@ -39,8 +41,14 @@
         var params = {}, tokens,
             re = /[?&]?([^=]+)=([^&]*)/g;
         try {
-            qs = location.search.split("+").join(" ");
-
+            var qs = "";
+            if (location.search!="") {
+                qs = location.search;
+            }
+            else if (location.hash!="") {
+                qs = location.hash;
+            }
+            qs = qs.split("+").join(" ");
             while (tokens = re.exec(qs)) {
                 params[decodeURIComponent(tokens[1])]
                     = decodeURIComponent(tokens[2]);
@@ -89,7 +97,7 @@
     var params = getQueryParams();
 
     if (params["zzishtoken"]!=undefined) {
-        Zzish.debugState(true,false);
+        Zzish.debugState(defaultLocalEnabled,defaultWso2Enabled);
         Zzish.init(params["zzishtoken"]);
     }
     if (params["cancel"]!=undefined) 
@@ -480,7 +488,9 @@
     };
 
     /**
-     * Authenticate user based on name and classcode
+     * Authenticate user based on name and classcode. 
+     * Returns 409 if user has logged in on a different device with the same name 
+     * within a specied period (see error message for details)
      *
      * @param id - A unique Id for the user (required)
      * @param name - The name of the user (required)
