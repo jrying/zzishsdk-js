@@ -39,8 +39,14 @@
         var params = {}, tokens,
             re = /[?&]?([^=]+)=([^&]*)/g;
         try {
-            qs = location.search.split("+").join(" ");
-
+            var qs = "";
+            if (location.search!="") {
+                qs = location.search;
+            }
+            else if (location.hash!="") {
+                qs = location.hash;
+            }
+            qs = qs.split("+").join(" ");
             while (tokens = re.exec(qs)) {
                 params[decodeURIComponent(tokens[1])]
                     = decodeURIComponent(tokens[2]);
@@ -480,7 +486,9 @@
     };
 
     /**
-     * Authenticate user based on name and classcode
+     * Authenticate user based on name and classcode. 
+     * Returns 409 if user has logged in on a different device with the same name 
+     * within a specied period (see error message for details)
      *
      * @param id - A unique Id for the user (required)
      * @param name - The name of the user (required)
