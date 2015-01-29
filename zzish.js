@@ -104,7 +104,7 @@
     }
     if (params["cancel"]!=undefined) 
     {
-        localStorage.removeItem("zzishtoken");
+        localStorage.removeItem("token");
     }    
 
 
@@ -712,7 +712,7 @@
     Zzish.login = function (type,successUrl,callback) {
         if (stateful()) {
             //check if we already have a token
-            token = localStorage.getItem("zzishtoken");
+            token = localStorage.getItem("token");
         }
         if (token==undefined) {
             var token_request = {
@@ -723,7 +723,7 @@
             //create a token first
             sendData(token_request, function (err, data) {
                     callCallBack(err, data, function(err,token) {
-                    localStorage.setItem("zzishtoken",token);
+                    localStorage.setItem("token",token);
                     loadLoginWithToken(type,token,callback);
                 });
             });
@@ -739,7 +739,7 @@
             token = getQueryParams()["token"];
         }
         if (token==undefined && stateful()) {
-            token = localStorage.getItem("zzishtoken");
+            token = localStorage.getItem("token");
         }
         if (token!=undefined) {
             var token_request = {
@@ -769,7 +769,7 @@
             url: baseUrl + "profiles/tokens/" + token
         }
         if (stateful()) {
-            localStorage.removeItem("zzishtoken");
+            localStorage.removeItem("token");
         }
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
