@@ -28,6 +28,8 @@
     var logEnabled = false;
     //make SDK stateless to test
     var makeStateless = false;
+    var defaultLocalEnabled = false;
+    var defaultWso2Enabled = false;
 
     Zzish.debugState = function(l1,w1) {
         localStateSet = l1;
@@ -95,7 +97,7 @@
     var params = getQueryParams();
 
     if (params["zzishtoken"]!=undefined) {
-        Zzish.debugState(true,false);
+        Zzish.debugState(defaultLocalEnabled,defaultWso2Enabled);
         Zzish.init(params["zzishtoken"]);
     }
     if (params["cancel"]!=undefined) 
