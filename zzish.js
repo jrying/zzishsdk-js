@@ -1,110 +1,97 @@
-// Global Zzish object
+  // Global Zzish object
 
-(function () {
-
-
-    Zzish = {};
-
-/**** FRONT END JAVASCRIPT STUFF (WITH STATE) ***/
-
-//STATE THAT NEEDS TO BE TRACK PER USER (ON THE CLIENT SIDE)
-
-    //tracks this device
-    var deviceId;
-    //tracks a session (resets when a new user is selected)
-    var sessionId;
-    //the app Id (sandbox or production) generated from developer console (https://developer.zzish.com)
-    var appId;
-    //keep track of the current user (so we know when session needs to be updated)
-    var currentUser = null;
+  (function () {
 
 
-/**** CONFIGURATION ******/
+      Zzish = {};
 
-    var header = "X-ApplicationId";    
-    var headerprefix = "";    
-    var baseUrl = "http://api.zzish.co.uk/api/";
-    var webUrl = "http://www.zzish.co.uk/"
-    var logEnabled = false;
-    //make SDK stateless to test
-    var makeStateless = false;
-    var defaultLocalEnabled = false;
-    var defaultWso2Enabled = false;
+  /**** FRONT END JAVASCRIPT STUFF (WITH STATE) ***/
 
-    Zzish.debugState = function(l1,w1) {
-        localStateSet = l1;
-        wso2 = w1;
-    }
+  //STATE THAT NEEDS TO BE TRACK PER USER (ON THE CLIENT SIDE)
+
+      //tracks this device
+      var deviceId;
+      //tracks a session (resets when a new user is selected)
+      var sessionId;
+      //the app Id (sandbox or production) generated from developer console (https://developer.zzish.com)
+      var appId;
+      //keep track of the current user (so we know when session needs to be updated)
+      var currentUser = null;
 
 
-    function getQueryParams() {
-        var params = {}, tokens,
-            re = /[?&]?([^=]+)=([^&]*)/g;
-        try {
-            var qs = "";
-            if (location.search!="") {
-                qs = location.search;
-            }
-            else if (location.hash!="") {
-                qs = location.hash;
-                indexOf = qs.indexOf("?");
-                qs = qs.substring(indexOf+1);
-            }
-            qs = qs.split("+").join(" ");
-            while (tokens = re.exec(qs)) {
-                params[decodeURIComponent(tokens[1])]
-                    = decodeURIComponent(tokens[2]);
-            }
-        }
-        catch (err) {
+  /**** CONFIGURATION ******/
 
-        }
-        return params;
-    }
+      var baseUrl = "http://api.zzish.co.uk/api/";
+      var header = "Authorization";
+      var headerprefix = "Bearer ";
+      var webUrl = "http://www.zzish.co.uk/";
+      var logEnabled = true;
+      //make SDK stateless to test
+      var makeStateless = false;
 
-    /**
-     * Initialise Zzish instance
-     */
-    Zzish.init = function (applicationId) {
-        //generate a device if we don't have one
-        if (stateful()) {
-            deviceId = localStorage.getItem("deviceId");
-            if (deviceId == null) {
-                deviceId = v4();
-                localStorage.setItem("deviceId", deviceId);
-            }
-        }
-        appId = applicationId;
-        try {
-            if (localStateSet!=undefined && localStateSet) {
-                baseUrl = "http://localhost:8080/zzishapi/api/";  
-                webUrl = "http://localhost:3000/";
-                logEnabled = true;
-            }
-        }
-        catch (err) {
+      Zzish.debugState = function(l1,w1) {
+          localStateSet = l1;
+          wso2 = w1;
+      };
 
-        }
-        try {
-            if (wso2!=undefined && wso2=="true") {
-                header = "Authorization";
-                headerprefix = "Bearer ";
-            }
-        }
-        catch (err) {
 
-        }        
+      function getQueryParams() {
+          var params = {}, tokens,
+              re = /[?&]?([^=]+)=([^&]*)/g;
+          try {
+              qs = location.search.split("+").join(" ");
+
+              while (tokens == re.exec(qs)) {
+                  params[decodeURIComponent(tokens[1])] = decodeURIComponent(tokens[2]);
+              }
+          }
+          catch (err) {
+
+          }
+          return params;
+      }
+
+      /**
+      * Initialise Zzish instance
+      */
+      Zzish.init = function (applicationId, apiUrl, wso2) {
+          //generate a device if we don't have one
+          if (stateful()) {
+              deviceId = localStorage.getItem("deviceId");
+              if (deviceId === null) {
+                  deviceId = v4();
+                  localStorage.setItem("deviceId", deviceId);
+              }
+          }
+          appId = applicationId;
+          if (apiUrl !== undefined) {
+            baseUrl = apiUrl;
+          }
+          try {
+              if (localStateSet!==undefined && localStateSet) {
+                  baseUrl = "http://localhost:8080/zzishapi/api/";  
+                  webUrl = "http://localhost:3000/";
+                  logEnabled = true;
+              }
+          }
+          catch (err) {
+
+          }
+          if (wso2 === false) {
+            header = "X-ApplicationId";    
+            headerprefix = "";
+          }
     };
 
     var params = getQueryParams();
 
-    if (params["zzishtoken"]!=undefined) {
-        Zzish.debugState(defaultLocalEnabled,defaultWso2Enabled);
-        Zzish.init(params["zzishtoken"]);
+    if (params.zzishtoken !== undefined) {
+        Zzish.debugState(true,false);
+        Zzish.init(params.zzishtoken);
     }
-    if (params["cancel"]!=undefined) 
+    if (params.cancel!==undefined) 
     {
-        localStorage.removeItem("token");
+        localStorage.removeItem("zzishtoken");
     }    
 
 
@@ -153,10 +140,10 @@
      * @return The user (returns a server user if it already exists). If it's the current User, returns that user
      */
     Zzish.getUser = function (id, name, callback) {
-        if (id==undefined) id = v4();
+        if (id===undefined) id = v4();
         if (stateful()) {
             //that means we have a front end service so we can check state
-            if (currentUser==undefined || currentUser.id != id) {
+            if (currentUser===undefined || currentUser.id != id) {
                 sessionId = v4();
                 Zzish.createUser(id,name,function(err,message) {
                     if (!err) {
@@ -202,15 +189,15 @@
         if (!currentUser || !stateful() || userId!=currentUser.id) {
             currentUser = {
                 uuid: userId
-            }
-        };
+            };
+        }
         aid = v4();
         definition = {};
         if(options) {
             definition = options.definition;
         }
-        if (definition==undefined) definition = {};
-        if (definition.type==undefined) {
+        if (definition===undefined) definition = {};
+        if (definition.type===undefined) {
             definition.type = activityName;    
         }        
         var message = {
@@ -239,7 +226,7 @@
             verb: "http://activitystrea.ms/schema/1.0/complete",
             attributes: states,
             activityUuid: activityId
-        }, callback)
+        }, callback);
     };
 
     /**
@@ -253,7 +240,7 @@
         sendMessage({
             verb: "http://activitystrea.ms/schema/1.0/cancel",
             activityUuid: activityId
-        }, callback)
+        }, callback);
     };
 
     /**
@@ -275,24 +262,24 @@
                 type: actionName
             }
         };
-        if (response != undefined) {
-            action["response"] = response;
+        if (response !== undefined) {
+            action.response = response;
         }
-        if (score != undefined) {
-            action["score"] = parseFloat(score);
+        if (score !== undefined) {
+            action.score = parseFloat(score);
         }
-        if (correct != undefined) {
-            action["correct"] = correct;
+        if (correct !== undefined) {
+            action.correct = correct;
         }
-        if (duration != undefined) {
-            action["duration"] = parseInt(duration);
+        if (duration !== undefined) {
+            action.duration = parseInt(duration);
         }
-        if (attempts != undefined) {
-            action["attempts"] = parseInt(attempts);
+        if (attempts !== undefined) {
+            action.attempts = parseInt(attempts);
         }
-        if (attributes != undefined && attributes != "") {
+        if (attributes !== undefined && attributes !== "") {
             action.state = {};
-            action.state["attributes"] = JSON.parse(attributes);
+            action.state.attributes = JSON.parse(attributes);
         }
         sendMessage({
             verb: "http://activitystrea.ms/schema/1.0/start",
@@ -334,7 +321,7 @@
                     callback(status, message);
                 }
             });
-        })
+        });
     };
 
     /**
@@ -348,8 +335,8 @@
         data.userUuid = currentUser.uuid;
         data.deviceId = deviceId;
         data.sessionId = sessionId;
-        if (data.attributes == undefined) {
-            data.attributes = {}
+        if (data.attributes === undefined) {
+            data.attributes = {};
         }
         var message = buildSimulationMessage(data);
         var headers = {
@@ -364,7 +351,7 @@
         };
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
-        })
+        });
     };
 
     /**
@@ -404,17 +391,17 @@
         }
         if (!!data.attributes) {
             var found = false;
-            for (i in data.attributes) {
+            for (var i in data.attributes) {
                 found = true;
             }
             if (found) {
                 message.object.state = {
                     attributes: data.attributes
-                }
+                };
             }
         }
         if (!!data.actions) {
-            if (data.actions[0].attributes && data.actions[0].attributes.length != undefined) {
+            if (data.actions[0].attributes && data.actions[0].attributes.length !== undefined) {
                 data.actions[0].state.attributes = data.actions[0].attributes;
             }
             message.actions = data.actions;
@@ -443,12 +430,12 @@
      */
     function callCallBack(err, data, callback) {
         //check if callback exists
-        if (callback != undefined) {
-            if (err != undefined) {
+        if (callback !== undefined) {
+            if (err !== undefined) {
                 //an error has ocurred when trying to get response
                 callback(err.status, err.message);
             }
-            else if (data != undefined) {
+            else if (data !== undefined) {
                 //check if api returns 200
                 if (data.status == 200) {
                     //return payload as message will be null
@@ -475,7 +462,7 @@
      * @param code - The Zzish Class code (required)
      */
     Zzish.validateClassCode = function (code) {
-        if (code!=undefined && code.length>1) {
+        if (code!==undefined && code.length>1) {
             var charLast = code.slice(-1);           
             var total = 0; 
             for (counter=0;counter<code.length-1;counter++) {
@@ -490,9 +477,7 @@
     };
 
     /**
-     * Authenticate user based on name and classcode. 
-     * Returns 409 if user has logged in on a different device with the same name 
-     * within a specied period (see error message for details)
+     * Authenticate user based on name and classcode
      *
      * @param id - A unique Id for the user (required)
      * @param name - The name of the user (required)
@@ -512,7 +497,7 @@
         };
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
-        })
+        });
     };
 
     /**
@@ -534,7 +519,7 @@
         };
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
-        })
+        });
     };
 
 
@@ -551,7 +536,7 @@
         };
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
-        })
+        });
     };
 
 
@@ -627,6 +612,7 @@
      * @param callback - A callback to call when done (returns error AND (message or list of zzish,name))
      */
     Zzish.listContent = function (profileId, callback) {
+      console.log('Geting contents for profile', profileId, callback);
         var request = {
             method: "GET",
             url: baseUrl + "profiles/" + profileId + "/contents"
@@ -663,11 +649,11 @@
      */
     Zzish.publishContentToGroup = function (profileId, email, uuid, code, callback) {
         var data = {};
-        if (code!=undefined && code!='') {
-            data['code'] = code;
+        if (code!==undefined && code!=='') {
+            data.code = code;
         }
-        if (email!=undefined && email!='') {
-            data['email'] = email;
+        if (email!==undefined && email!=='') {
+            data.email = email;
         }
         var request = {
             method: "POST",
@@ -712,18 +698,18 @@
     Zzish.login = function (type,successUrl,callback) {
         if (stateful()) {
             //check if we already have a token
-            token = localStorage.getItem("token");
+            token = localStorage.getItem("zzishtoken");
         }
-        if (token==undefined) {
+        if (token===undefined) {
             var token_request = {
                 method: "POST",
                 url: baseUrl + "profiles/tokens",
                 data: { redirectURL: successUrl }
-            }
+            };
             //create a token first
             sendData(token_request, function (err, data) {
                     callCallBack(err, data, function(err,token) {
-                    localStorage.setItem("token",token);
+                    localStorage.setItem("zzishtoken",token);
                     loadLoginWithToken(type,token,callback);
                 });
             });
@@ -731,21 +717,21 @@
         else {
             loadLoginWithToken(type,token,callback);
         }
-    }
+    };
 
     Zzish.getCurrentUser = function(token,callback) {
-        if (token==undefined) {
+        if (token===undefined) {
             //see if we can get token from query params
-            token = getQueryParams()["token"];
+            token = getQueryParams().token;
         }
-        if (token==undefined && stateful()) {
-            token = localStorage.getItem("token");
+        if (token===undefined && stateful()) {
+            token = localStorage.getItem("zzishtoken");
         }
-        if (token!=undefined) {
+        if (token!==undefined) {
             var token_request = {
                 method: "GET",
                 url: baseUrl + "profiles/tokens/" + token
-            }
+            };
             //create a token first
             sendData(token_request, function (err, data) {
                 callCallBack(err, data, function(err,data) {                
@@ -757,7 +743,7 @@
         else {
             callback();
         }   
-    }
+    };
 
     /**
      * Logout from Zzish
@@ -767,14 +753,14 @@
         var request = {
             method: "DELETE",
             url: baseUrl + "profiles/tokens/" + token
-        }
+        };
         if (stateful()) {
-            localStorage.removeItem("token");
+            localStorage.removeItem("zzishtoken");
         }
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
         });
-    }
+    };
 
     /**** PROXY STUFF TO SEND DATA ***/
     /*** REQUEST has 3 attributes (method, url and data) ****/
@@ -813,7 +799,7 @@
 
 
         req.open(request.method, request.url, true);
-        req.setRequestHeader(header, appId);
+        req.setRequestHeader(header,headerprefix + appId);
         req.setRequestHeader('Content-Type', 'application/json');
         req.send(JSON.stringify(request.data));
     }
@@ -960,29 +946,29 @@
 
         options = options || {};
 
-        var clockseq = options.clockseq != null ? options.clockseq : _clockseq;
+        var clockseq = options.clockseq !== null ? options.clockseq : _clockseq;
 
         // UUID timestamps are 100 nano-second units since the Gregorian epoch,
         // (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
         // time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
         // (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
-        var msecs = options.msecs != null ? options.msecs : new Date().getTime();
+        var msecs = options.msecs !== null ? options.msecs : new Date().getTime();
 
         // Per 4.2.1.2, use count of zzish's generated during the current clock
         // cycle to simulate higher resolution clock
-        var nsecs = options.nsecs != null ? options.nsecs : _lastNSecs + 1;
+        var nsecs = options.nsecs !== null ? options.nsecs : _lastNSecs + 1;
 
         // Time since last zzish creation (in msecs)
         var dt = (msecs - _lastMSecs) + (nsecs - _lastNSecs) / 10000;
 
         // Per 4.2.1.2, Bump clockseq on clock regression
-        if (dt < 0 && options.clockseq == null) {
+        if (dt < 0 && options.clockseq === null) {
             clockseq = clockseq + 1 & 0x3fff;
         }
 
         // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
         // time interval
-        if ((dt < 0 || msecs > _lastMSecs) && options.nsecs == null) {
+        if ((dt < 0 || msecs > _lastMSecs) && options.nsecs === null) {
             nsecs = 0;
         }
 
