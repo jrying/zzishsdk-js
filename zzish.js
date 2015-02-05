@@ -21,12 +21,13 @@
 
 /**** CONFIGURATION ******/
 
-    var header = "X-ApplicationId";    
-    var headerprefix = "";    
-    var baseUrl = "http://api.zzish.co.uk/api/";
-    var webUrl = "http://www.zzish.co.uk/"
-    var logEnabled = false;
+    var baseUrl = "http://prod-api-gw-elb-1654550021.eu-west-1.elb.amazonaws.com/";
+    var webUrl = "http://prod-web-elb-1920202911.eu-west-1.elb.amazonaws.com/"
+    var logEnabled = true;
     //make SDK stateless to test
+    
+    var header = "Authorization";    
+    var headerprefix = "Bearer ";        
     var makeStateless = false;
     var defaultLocalEnabled = false;
     var defaultWso2Enabled = false;
@@ -79,6 +80,8 @@
             if (localStateSet!=undefined && localStateSet) {
                 baseUrl = "http://localhost:8080/zzishapi/api/";  
                 webUrl = "http://localhost:3000/";
+                header = "X-ApplicationId";    
+                headerprefix = "";    
                 logEnabled = true;
             }
         }
@@ -813,7 +816,7 @@
 
 
         req.open(request.method, request.url, true);
-        req.setRequestHeader(header, appId);
+        req.setRequestHeader(header, headerprefix+appId);
         req.setRequestHeader('Content-Type', 'application/json');
         req.send(JSON.stringify(request.data));
     }
