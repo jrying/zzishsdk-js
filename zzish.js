@@ -21,8 +21,8 @@
 
 /**** CONFIGURATION ******/
 
-    var baseUrl = "http://prod-api-gw-elb-1654550021.eu-west-1.elb.amazonaws.com/";
-    var webUrl = "http://prod-web-elb-1920202911.eu-west-1.elb.amazonaws.com/"
+    var baseUrl = "https://api.zzish.com/";
+    var webUrl = "https://www.zzish.com/"
     var logEnabled = true;
     //make SDK stateless to test
     
