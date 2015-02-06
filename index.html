@@ -43,7 +43,7 @@
                     command = Zzish.initState(deviceId,sessionId);
                 }
                 command.getUser($("#userId").val(),$("#name").val(),function(err,message) {
-                    if (err) {
+                    if (!err) {
                         console.log("User " + message.uuid + "created");        
                     }
                     else {
@@ -72,7 +72,7 @@
                 }   
                 if (validRequest) {
                     activityId = Zzish.startActivity($("#userId").val(),$("#aname").val(),$("#groupCode").val(),function(err,message) {
-                        if (err) {
+                        if (!err) {
                             console.log("Activity " + message.uuid + "started");        
                         }
                         else {
@@ -93,7 +93,7 @@
         function logAction() {
             if (initApp()) {                        
                 Zzish.logAction(activityId,$("#actname").val(),$("#response").val(),$("#Score").val(),$("#correct").val(),$("#Duration").val(),$("#Attempts").val(),$("#attributes").val(),function(err,message) {
-                    if (err) {
+                    if (!err) {
                         console.log("logAction " + message.uuid + "started");        
                     }
                     else {
@@ -109,7 +109,7 @@
         function stopActivity() {
             if (initApp()) {             
                 Zzish.stopActivity(activityId,$("#aattributes").val(),function(err,message) {
-                    if (err) {
+                    if (!err) {
                         console.log("Activity " + message.uuid + "started");        
                     }
                     else {
@@ -125,7 +125,7 @@
         function cancelActivity() {
             if (initApp()) {                        
                 Zzish.cancelActivity(activityId,function(err,message) {
-                    if (err) {
+                    if (!err) {
                         console.log("Activity " + message.uuid + "cancelled");        
                     }
                     else {
