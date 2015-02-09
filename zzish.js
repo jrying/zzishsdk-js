@@ -103,6 +103,7 @@
 
     if (params["zzishtoken"]!=undefined) {
         Zzish.debugState(defaultLocalEnabled,defaultWso2Enabled);
+        localStorage.setItem("zzishtoken",params["zzishtoken"]);
         Zzish.init(params["zzishtoken"]);
     }
     if (params["cancel"]!=undefined) 
