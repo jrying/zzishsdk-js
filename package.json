@@ -4,7 +4,7 @@
   "description": "SDK for Zzish API",
   "main": "zzish.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jasmine"
   },
   "repository": {
     "type": "git",
@@ -20,5 +20,11 @@
   "bugs": {
     "url": "https://github.com/zzishdev/zzishsdk-js/issues"
   },
-  "homepage": "https://github.com/zzishdev/zzishsdk-js"
+  "homepage": "https://github.com/zzishdev/zzishsdk-js",
+  "devDependencies": {
+    "jasmine": "^2.2.1"
+  },
+  "dependencies": {
+    "xmlhttprequest": "^1.7.0"
+  }
 }
