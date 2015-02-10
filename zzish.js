@@ -239,10 +239,16 @@
      *
      */
     Zzish.stopActivity = function (activityId, states, callback) {
+        var pro;
+        if (states.proficiency!=undefined) {
+            pro = states.proficiency;
+            delete states.proficiency;
+        }
         sendMessage({
-            verb: "http://activitystrea.ms/schema/1.0/complete",
-            attributes: states,
-            activityUuid: activityId
+             verb: "http://activitystrea.ms/schema/1.0/complete",
+             attributes: states,
+             activityUuid: activityId,
+             activityProficiency: pro
         }, callback)
     };
 
@@ -295,8 +301,19 @@
             action["attempts"] = parseInt(attempts);
         }
         if (attributes != undefined && attributes != "") {
-            action.state = {};
-            action.state["attributes"] = JSON.parse(attributes);
+             action.state = {};
+            if (attributes["proficiency"]!=undefined) {
+                proficiency = attributes["proficiency"];
+                delete attributes["proficiency"];
+                action.state["proficiency"]=proficiency;
+            }
+            var found = false;
+            for (i in attributes) {
+                found = true;
+            }
+            if (found) {
+                action.state["attributes"] = JSON.parse(attributes);
+            }
         }
         sendMessage({
             verb: "http://activitystrea.ms/schema/1.0/start",
@@ -774,6 +791,7 @@
         }
         if (stateful()) {
             localStorage.removeItem("token");
+            localStorage.removeItem("zzishtoken");
         }
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
