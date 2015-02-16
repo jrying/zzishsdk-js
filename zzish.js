@@ -41,12 +41,12 @@
     function getBaseUrl() {        
         if (window!=undefined && window.location!=undefined && window.location.href!=undefined) {
             var url = window.location.href;
-            var arr = url.split("/");
-            var result = arr[0] + "//" + baseUrl;
+            if (url!=undefined) {
+                var arr = url.split("/");
+                return arr[0] + "//" + baseUrl;                
+            }
         }
-        else {
-            return defaultProtocol + baseUrl;
-        }
+        return defaultProtocol + baseUrl;
     }
 
 
