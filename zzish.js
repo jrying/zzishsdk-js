@@ -21,7 +21,8 @@
 
 /**** CONFIGURATION ******/
 
-    var baseUrl = "https://api.zzish.com/";
+    var defaultProtocol = "https://";
+    var baseUrl = "api.zzish.com/";
     var webUrl = "https://www.zzish.com/"
     var logEnabled = true;
     //make SDK stateless to test
@@ -35,6 +36,17 @@
     Zzish.debugState = function(l1,w1) {
         localStateSet = l1;
         wso2 = w1;
+    }
+
+    function getBaseUrl() {        
+        if (window!=undefined && window.location!=undefined && window.location.href!=undefined) {
+            var url = window.location.href;
+            var arr = url.split("/");
+            var result = arr[0] + "//" + baseUrl;
+        }
+        else {
+            return defaultProtocol + baseUrl;
+        }
     }
 
 
@@ -78,7 +90,8 @@
         appId = applicationId;
         try {
             if (localStateSet!=undefined && localStateSet) {
-                baseUrl = "http://localhost:8080/zzishapi/api/";  
+                defaultProtocol = "http://"
+                baseUrl = "localhost:8080/zzishapi/api/";  
                 webUrl = "http://localhost:3000/";
                 header = "X-ApplicationId";    
                 headerprefix = "";    
@@ -334,7 +347,7 @@
     Zzish.registerWithClass = function(profileId, code, callback) {
         var request = {
             method: "POST",
-            url: baseUrl + "profiles/" + profileId + "/consumers/register",
+            url: getBaseUrl() + "profiles/" + profileId + "/consumers/register",
             data: {code: code}
         };
         sendData(request, function (err, data) {
@@ -380,7 +393,7 @@
         if (logEnabled) console.log("Sending" + JSON.stringify(message));
         var request = {
             method: "POST",
-            url: baseUrl + "statements",
+            url: getBaseUrl() + "statements",
             data: message
         };
         sendData(request, function (err, data) {
@@ -528,7 +541,7 @@
         };
         var request = {
             method: "POST",
-            url: baseUrl + "profiles/auth",
+            url: getBaseUrl() + "profiles/auth",
             data: message
         };
         sendData(request, function (err, data) {
@@ -550,7 +563,7 @@
         };
         var request = {
             method: "POST",
-            url: baseUrl + "profiles",
+            url: getBaseUrl() + "profiles",
             data: message
         };
         sendData(request, function (err, data) {
@@ -568,7 +581,7 @@
     Zzish.listGroups = function (id, callback) {
         var request = {
             method: "GET",
-            url: baseUrl + "profiles/"+id+"/groups",
+            url: getBaseUrl() + "profiles/"+id+"/groups",
         };
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
@@ -595,7 +608,7 @@
         };
         var request = {
             method: "POST",
-            url: baseUrl + "profiles/" + profileId + "/contents/" + id,
+            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + id,
             data: data
         };
         sendData(request, function (err, data) {
@@ -612,7 +625,7 @@
     Zzish.deleteContent = function (profileId, id, callback) {
         var request = {
             method: "DELETE",
-            url: baseUrl + "profiles/" + profileId + "/contents/" + id
+            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + id
         };
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
@@ -628,7 +641,7 @@
     Zzish.getContent = function (profileId, uuid, callback) {
         var request = {
             method: "GET",
-            url: baseUrl + "profiles/" + profileId + "/contents/" + uuid
+            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + uuid
         };
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
@@ -650,7 +663,7 @@
     Zzish.listContent = function (profileId, callback) {
         var request = {
             method: "GET",
-            url: baseUrl + "profiles/" + profileId + "/contents"
+            url: getBaseUrl() + "profiles/" + profileId + "/contents"
         };
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
@@ -692,7 +705,7 @@
         }
         var request = {
             method: "POST",
-            url: baseUrl + "profiles/" + profileId + "/contents/" + uuid + "/publish",
+            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + uuid + "/publish",
             data: data
         };
         sendData(request, function (err, data) {
@@ -738,7 +751,7 @@
         if (token==undefined) {
             var token_request = {
                 method: "POST",
-                url: baseUrl + "profiles/tokens",
+                url: getBaseUrl() + "profiles/tokens",
                 data: { redirectURL: successUrl }
             }
             //create a token first
@@ -765,7 +778,7 @@
         if (token!=undefined) {
             var token_request = {
                 method: "GET",
-                url: baseUrl + "profiles/tokens/" + token
+                url: getBaseUrl() + "profiles/tokens/" + token
             }
             //create a token first
             sendData(token_request, function (err, data) {
@@ -787,7 +800,7 @@
     Zzish.logout = function (token,callback) {
         var request = {
             method: "DELETE",
-            url: baseUrl + "profiles/tokens/" + token
+            url: getBaseUrl() + "profiles/tokens/" + token
         }
         if (stateful()) {
             localStorage.removeItem("token");
