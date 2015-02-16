@@ -806,13 +806,23 @@
         XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
     }
 
+    var isIE8 = window.XDomainRequest ? true : false;
+    var req;
+    var ocallback;
+
+
     function sendData(request, callback) {
         if (typeof request.method === 'undefined') {
             request.method = "POST";
         }
         if (logEnabled) console.log('Proxy.request ',request);
-        req = new XMLHttpRequest();
-
+        if (isIE8) {
+            req = new window.XDomainRequest();
+            ocallback = callback;
+        }
+        else {
+            req = new XMLHttpRequest();
+        }
         if(req.addEventListener){
             req.addEventListener('load', function () {
             response(this, callback, logEnabled);
@@ -822,15 +832,7 @@
                 error(this, callback, logEnabled);
             }, false);
         }else{
-            //IE 8
-            req.attachEvent('onload', function () {
-            response(this, callback, logEnabled);
-            }, false);
-
-            req.attachEvent('onerror', function () {
-                error(this, callback, logEnabled);
-            }, false);
-
+            req.onload = outputResult;
         }
 
 
@@ -838,6 +840,13 @@
         req.setRequestHeader(header, headerprefix+appId);
         req.setRequestHeader('Content-Type', 'application/json');
         req.send(JSON.stringify(request.data));
+    }
+
+    function outputResult() {
+        if (logEnabled) console.log('Proxy.response callback',req.responseText);
+        if (typeof ocallback === 'function') {
+            ocallback(null,req.responseText);
+        }
     }
 
     function response(resp, callback, log) {
