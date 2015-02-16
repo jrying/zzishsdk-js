@@ -32,6 +32,7 @@
     var makeStateless = false;
     var defaultLocalEnabled = false;
     var defaultWso2Enabled = false;
+    var isIE8 = window.XDomainRequest ? true : false;
 
     Zzish.debugState = function(l1,w1) {
         localStateSet = l1;
@@ -39,7 +40,7 @@
     }
 
     function getBaseUrl() {        
-        if (window!=undefined && window.location!=undefined && window.location.href!=undefined) {
+        if (isIE8 && window!=undefined && window.location!=undefined && window.location.href!=undefined) {
             var url = window.location.href;
             if (url!=undefined) {
                 var arr = url.split("/");
@@ -819,7 +820,7 @@
         XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
     }
 
-    var isIE8 = window.XDomainRequest ? true : false;
+    
     var req;
     var ocallback;
 
