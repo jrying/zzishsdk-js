@@ -32,7 +32,13 @@
     var makeStateless = false;
     var defaultLocalEnabled = false;
     var defaultWso2Enabled = false;
-    var isIE8 = window.XDomainRequest ? true : false;
+    
+    function isIE8() {
+        if (stateful()) {
+            return (window!=undefined && window.XDomainRequest) ? true : false;    
+        }
+        return false;    
+    }
 
     Zzish.debugState = function(l1,w1) {
         localStateSet = l1;
@@ -40,7 +46,7 @@
     }
 
     function getBaseUrl() {        
-        if (isIE8 && window!=undefined && window.location!=undefined && window.location.href!=undefined) {
+        if (isIE8() && window!=undefined && window.location!=undefined && window.location.href!=undefined) {
             var url = window.location.href;
             if (url!=undefined) {
                 var arr = url.split("/");
@@ -154,19 +160,6 @@
      *
      * @param id - A unique Id for the user (required)
      * @param name - The name of the user (optional)
-     * @param options - Additional optios for a user
-     * @param callback - An optional callback after user has been saved on server
-     * @return The user (returns a server user if it already exists). If it's the current User, returns that user
-     */
-    Zzish.getUserWithOptions = function (id, name, options, callback) {
-
-    };
-
-    /**
-     * Get the User (if the id is the same as the current one, returns the current user)
-     *
-     * @param id - A unique Id for the user (required)
-     * @param name - The name of the user (optional)
      * @param callback - An optional callback after user has been saved on server
      * @return The user (returns a server user if it already exists). If it's the current User, returns that user
      */
@@ -254,7 +247,7 @@
      */
     Zzish.stopActivity = function (activityId, states, callback) {
         var pro;
-        if (states.proficiency!=undefined) {
+        if (states!=undefined && states.proficiency!=undefined) {
             pro = states.proficiency;
             delete states.proficiency;
         }
@@ -830,7 +823,7 @@
             request.method = "POST";
         }
         if (logEnabled) console.log('Proxy.request ',request);
-        if (isIE8) {
+        if (isIE8()) {
             req = new window.XDomainRequest();
             ocallback = callback;
         }
