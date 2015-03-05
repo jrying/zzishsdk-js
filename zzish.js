@@ -544,6 +544,24 @@
     };
 
     /**
+     * Logout a user
+     *
+     * @param id - A unique Id for the user (required)
+     * @param callback - An optional callback after user has been saved on server
+     */
+     
+    Zzish.unauthUser = function (id,  callback) {
+        var request = {
+            method: "POST",
+            url: getBaseUrl() + "profiles/"+id+"/logout",
+            data: {}
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, callback);
+        })
+    };
+
+    /**
      * Create a user
      *
      * @param id - A unique Id for the user (required)
