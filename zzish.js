@@ -289,7 +289,7 @@
      *
      */
     Zzish.logAction = function (activityId, actionName, response, score, correct, duration, callback) {
-        var definition: {
+        var definition = {
             type: actionName
         };
         if (response != undefined) {
@@ -527,6 +527,8 @@
             username : name,
             passwordText: code
         };
+        //create new session
+        sessionId = uuid.v4();
         var request = {
             method: "POST",
             url: getBaseUrl() + "profiles/auth",
@@ -708,7 +710,7 @@
         };
         var request = {
             method: "POST",
-            url: getBaseUrl() + "profiles/" + profileId + "/categories/" + id,
+            url: getBaseUrl() + "profiles/" + profileId + "/categories/",
             data: data
         };
         sendData(request, function (err, data) {
@@ -743,14 +745,7 @@
             url: getBaseUrl() + "profiles/" + profileId + "/categories"
         };
         sendData(request, function (err, data) {
-            callCallBack(err, data, function (status, message) {
-                if (!err) {
-                    callback(err, list);
-                }
-                else {
-                    callback(status, message);
-                }
-            });
+            callCallBack(err, data, callback);
         });
     };    
 
