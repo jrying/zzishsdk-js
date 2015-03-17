@@ -224,10 +224,9 @@
         aid = v4();
         var message = {
             verb: "http://activitystrea.ms/schema/1.0/start",
-            activityUuid: aid,
-            parameters: parameters!=undefined?parameters:{}            
+            activityUuid: aid
         };        
-        sendMessage(message, callback);
+        sendMessage(message, parameters,callback);
         return aid;
     };    
 
@@ -258,9 +257,8 @@
         }      
         sendMessage({
              verb: "http://activitystrea.ms/schema/1.0/complete",
-             activityStates: haveState?stateMap:undefined,
              activityUuid: activityId
-        }, callback)
+        }, { states: haveState?stateMap:undefined},callback)
     };
 
     /**
@@ -274,7 +272,7 @@
         sendMessage({
             verb: "http://activitystrea.ms/schema/1.0/cancel",
             activityUuid: activityId
-        }, callback)
+        }, {}, callback)
     };
 
     /**
@@ -336,7 +334,7 @@
             verb: "http://activitystrea.ms/schema/1.0/start",
             activityUuid: activityId,
             actions: [action]
-        }, callback);        
+        }, parameters, callback);        
     }
 
     /**
@@ -346,17 +344,14 @@
      * @param callback - An optional callback to call when done (returns error,message)
      *
      */
-    var sendMessage = function (data, callback) {
+    var sendMessage = function (data, parameters, callback) {
         data.userUuid = currentUser.uuid;
-        if (data.extensions==undefined) {
-            data.extensions = {};
+        if (parameters.extensions==undefined) {
+            parameters.extensions = {};
         }
-        data.extensions["deviceId"] = deviceId;
-        data.extensions["sessionId"] = sessionId;
-        if (data.activityDefinition==undefined) {
-            data.activityDefinition = {};
-        }
-        var message = buildSimulationMessage(data);
+        parameters.extensions["deviceId"] = deviceId;
+        parameters.extensions["sessionId"] = sessionId;
+        var message = buildSimulationMessage(data,parameters);
         var headers = {
             'Content-Type': 'application/json'
         };
@@ -377,7 +372,10 @@
      * @param data
      * @returns partially built TinCan message
      */
-    var buildSimulationMessage = function (data) {
+    var buildSimulationMessage = function (data,parameters) {
+        if (parameters.activityDefinition==undefined) {
+            parameters.activityDefinition = {};
+        }
         var message = {
             actor: {
                 account: {
@@ -389,19 +387,19 @@
                 id: data.verb
             },
             object: {
-                definition: data.activityDefinition
+                definition: parameters.activityDefinition
             },
             id: data.activityUuid,
             context: {
                 extensions: {}
             }
         };
-        if (data.activityStates!=undefined) {
-            message.object.state = data.activityStates;
+        if (parameters.states!=undefined) {
+            message.object.state = parameters.states;
         }
-        if (data.extensions) {
-            for (i in data.extensions) {
-                message.context.extensions["http://www.zzish.com/context/extension/"+i] = data.extensions[i];
+        if (parameters.extensions) {
+            for (i in parameters.extensions) {
+                message.context.extensions["http://www.zzish.com/context/extension/"+i] = parameters.extensions[i];
             }
         }
         if (data.actions!=undefined) {
