@@ -197,7 +197,7 @@
      */
     Zzish.startActivity = function (userId, activityName, code, callback) {
         var parameters = {
-            definition: {
+            activityDefinition: {
                 type: activityName
             },            
             extensions: {
@@ -283,38 +283,43 @@
      * @param response - A string representation of the action (optional)
      * @param score - A float score (optional)
      * @param duration - A long duration (optional)
+     * @param attempts - The number of attempts
+     * @param attributes - JSON Attributes
      * @param callback - A callback to be called after message is sent (returns error,message)
      *
      */
-    Zzish.logAction = function (activityId, actionName, response, score, correct, duration, callback) {
+    Zzish.logAction = function (activityId, actionName, response, score, correct, duration, attempts, attributes, callback) {
         var definition = {
             type: actionName
         };
+        var result = {};
         if (response != undefined) {
-            definition["response"] = response;
+            result["response"] = response;
         }
         if (score != undefined) {
-            definition["score"] = parseFloat(score);
+            result["score"] = parseFloat(score);
         }
         if (correct != undefined) {
-            definition["correct"] = correct;
+            result["correct"] = correct;
         }
         if (duration != undefined) {
-            definition["duration"] = parseInt(duration);
+            result["duration"] = parseInt(duration);
         }
         if (attempts != undefined) {
-            definition["count"] = parseInt(attempts);
+            result["attempts"] = parseInt(attempts);
         }
-        Zzish.logActionWithObjects(activityId,{definition:definition},callback);
+        Zzish.logActionWithObjects(activityId,{definition:definition, result: result},callback);
     };
 
     Zzish.logActionWithObjects = function (activityId, parameters, callback) {
         if (parameters.definition==undefined) {
             parameters.definition = {};
         }
-        var action = {
-            definition: parameters.definition
+        var action = parameters.result;
+        if (action==undefined) {
+            action = {};
         }
+        action.definition = parameters.definition;
         if (parameters.attributes != undefined && parameters.attributes != "") {
             action.state = {};
             if (attributes["proficiency"]!=undefined) {
