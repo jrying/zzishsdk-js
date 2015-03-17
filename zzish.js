@@ -196,43 +196,37 @@
      * @return The activity zzish
      */
     Zzish.startActivity = function (userId, activityName, code, callback) {
-        return Zzish.startActivityWithOptions(userId,activityName,code,{}, callback);
+        var parameters = {
+            definition: {
+                type: activityName
+            },            
+            extensions: {
+                groupCode: code
+            }
+        }
+        return Zzish.startActivityWithObjects(userId,parameters, callback);
     };
 
     /**
      * Start Activity with name
      *
      * @param userId - The userId of the user (required)
-     * @param activityName - The name of the activity (required)
-     * @param code - The Zzish Class Code when creating a class in the learning hub (optional)
-     * @param options - Additional options
+     * @param parameters - The parameters Object which contains various configurations of the activity
      * @param callback - A callback to be called after message is sent (returns error,message)
      * @return The activity zzish
      */
-    Zzish.startActivityWithOptions = function (userId, activityName, code, options, callback) {
+    Zzish.startActivityWithObjects = function (userId, parameters, callback) {
         if (!currentUser || !stateful() || userId!=currentUser.id) {
             currentUser = {
                 uuid: userId
             }
         };
         aid = v4();
-        definition = {};
-        if(options) {
-            definition = options.definition;
-        }
-        if (definition==undefined) definition = {};
-        if (definition.type==undefined) {
-            definition.type = activityName;    
-        }        
         var message = {
             verb: "http://activitystrea.ms/schema/1.0/start",
             activityUuid: aid,
-            classCode: code,
-            activity_definition: definition            
+            parameters: parameters!=undefined?parameters:{}            
         };        
-        if (options.contentId) {
-            message.contentId = options.contentId;
-        }
         sendMessage(message, callback);
         return aid;
     };    
@@ -246,16 +240,26 @@
      *
      */
     Zzish.stopActivity = function (activityId, states, callback) {
-        var pro;
+        var pro = undefined;
+        var haveState = false;
         if (states!=undefined && states.proficiency!=undefined) {
             pro = states.proficiency;
             delete states.proficiency;
-        }
+        }       
+        var stateMap = {
+            states: states
+        } 
+        if (pro!=undefined) {
+            stateMap.proficiency = pro;
+            haveState = true;
+        }   
+        for (i in states) {
+            haveState = true;
+        }      
         sendMessage({
              verb: "http://activitystrea.ms/schema/1.0/complete",
-             attributes: states,
-             activityUuid: activityId,
-             activityProficiency: pro
+             activityStates: haveState?stateMap:undefined,
+             activityUuid: activityId
         }, callback)
     };
 
@@ -281,89 +285,59 @@
      * @param response - A string representation of the action (optional)
      * @param score - A float score (optional)
      * @param duration - A long duration (optional)
-     * @param attempts - The number of attempts taken (optional)
-     * @param attributes - A string represented JSON of attributes to save for this action (optional)
      * @param callback - A callback to be called after message is sent (returns error,message)
      *
      */
-    Zzish.logAction = function (activityId, actionName, response, score, correct, duration, attempts, attributes, callback) {
-        var action = {
-            definition: {
-                type: actionName
-            }
+    Zzish.logAction = function (activityId, actionName, response, score, correct, duration, callback) {
+        var definition: {
+            type: actionName
         };
         if (response != undefined) {
-            action["response"] = response;
+            definition["response"] = response;
         }
         if (score != undefined) {
-            action["score"] = parseFloat(score);
+            definition["score"] = parseFloat(score);
         }
         if (correct != undefined) {
-            action["correct"] = correct;
+            definition["correct"] = correct;
         }
         if (duration != undefined) {
-            action["duration"] = parseInt(duration);
+            definition["duration"] = parseInt(duration);
         }
         if (attempts != undefined) {
-            action["attempts"] = parseInt(attempts);
+            definition["count"] = parseInt(attempts);
         }
-        if (attributes != undefined && attributes != "") {
-             action.state = {};
+        Zzish.logActionWithObjects(activityId,{definition:definition},callback);
+    };
+
+    Zzish.logActionWithObjects = function (activityId, parameters, callback) {
+        if (parameters.definition==undefined) {
+            parameters.definition = {};
+        }
+        var action = {
+            definition: parameters.definition
+        }
+        if (parameters.attributes != undefined && parameters.attributes != "") {
+            action.state = {};
             if (attributes["proficiency"]!=undefined) {
-                proficiency = attributes["proficiency"];
-                delete attributes["proficiency"];
+                proficiency = parameters.attributes["proficiency"];
+                delete parameters.attributes["proficiency"];
                 action.state["proficiency"]=proficiency;
             }
             var found = false;
-            for (i in attributes) {
+            for (i in parameters.attributes) {
                 found = true;
             }
             if (found) {
-                action.state["attributes"] = JSON.parse(attributes);
+                action.state["attributes"] = JSON.parse(parameters.attributes);
             }
         }
         sendMessage({
             verb: "http://activitystrea.ms/schema/1.0/start",
             activityUuid: activityId,
             actions: [action]
-        }, callback);
-    };
-
-
-    /**
-     * Register a User with a class using group Code and return list of contents ("contents") and the zzish studen code ("code")
-     *
-     * @param profileId - The Profile Id
-     * @param code - The Zzish group Code
-     * @param callback - A callback to be called after message is sent (returns error,message)
-     *
-     */
-    Zzish.registerWithClass = function(profileId, code, callback) {
-        var request = {
-            method: "POST",
-            url: getBaseUrl() + "profiles/" + profileId + "/consumers/register",
-            data: {code: code}
-        };
-        sendData(request, function (err, data) {
-            callCallBack(err, data, function (status, message) {
-                if (!err) {
-                    if(!data.payload){
-                        callback(404, null);
-                    }else{
-                        var list = [];
-                        for (var i in data.payload.contents) {
-                            list.push(JSON.parse(data.payload.contents[i]));
-                        }
-                        message.contents = list;
-                        callback(err, message);
-                    }
-                }
-                else {
-                    callback(status, message);
-                }
-            });
-        })
-    };
+        }, callback);        
+    }
 
     /**
      * send message to REST API
@@ -374,10 +348,13 @@
      */
     var sendMessage = function (data, callback) {
         data.userUuid = currentUser.uuid;
-        data.deviceId = deviceId;
-        data.sessionId = sessionId;
-        if (data.attributes == undefined) {
-            data.attributes = {}
+        if (data.extensions==undefined) {
+            data.extensions = {};
+        }
+        data.extensions["deviceId"] = deviceId;
+        data.extensions["sessionId"] = sessionId;
+        if (data.activityDefinition==undefined) {
+            data.activityDefinition = {};
         }
         var message = buildSimulationMessage(data);
         var headers = {
@@ -412,43 +389,60 @@
                 id: data.verb
             },
             object: {
-                definition: data.activity_definition
+                definition: data.activityDefinition
             },
             id: data.activityUuid,
             context: {
-                extensions: {
-                    "http://www.zzish.com/context/extension/groupCode": data.classCode,
-                    "http://www.zzish.com/context/extension/deviceId": data.deviceId,
-                    "http://www.zzish.com/context/extension/sessionId": data.sessionId,
-                    "http://www.zzish.com/context/extension/contentId": data.contentId
-                }
+                extensions: {}
             }
         };
-        message.object = {
-            definition: {}
-        };        
-        if (data.activity_definition) {
-            message.object.definition = data.activity_definition;
+        if (data.activityStates!=undefined) {
+            message.object.state = data.activityStates;
         }
-        if (!!data.attributes) {
-            var found = false;
-            for (i in data.attributes) {
-                found = true;
-            }
-            if (found) {
-                message.object.state = {
-                    attributes: data.attributes
-                }
+        if (data.extensions) {
+            for (i in data.extensions) {
+                message.context.extensions["http://www.zzish.com/context/extension/"+i] = data.extensions[i];
             }
         }
-        if (!!data.actions) {
-            if (data.actions[0].attributes && data.actions[0].attributes.length != undefined) {
-                data.actions[0].state.attributes = data.actions[0].attributes;
-            }
+        if (data.actions!=undefined) {
             message.actions = data.actions;
         }
-
         return message;
+    };
+
+    /**
+     * Register a User with a class using group Code and return list of contents ("contents") and the zzish studen code ("code")
+     *
+     * @param profileId - The Profile Id
+     * @param code - The Zzish group Code
+     * @param callback - A callback to be called after message is sent (returns error,message)
+     *
+     */
+    Zzish.registerWithClass = function(profileId, code, callback) {
+        var request = {
+            method: "POST",
+            url: getBaseUrl() + "profiles/" + profileId + "/consumers/register",
+            data: {code: code}
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, function (status, message) {
+                if (!err) {
+                    if(!data.payload){
+                        callback(404, null);
+                    }else{
+                        var list = [];
+                        for (var i in data.payload.contents) {
+                            list.push(JSON.parse(data.payload.contents[i]));
+                        }
+                        message.contents = list;
+                        callback(err, message);
+                    }
+                }
+                else {
+                    callback(status, message);
+                }
+            });
+        })
     };
 
     /**
@@ -698,6 +692,67 @@
             });
         });
     };
+
+
+    /**
+     * Save a Zzish category object
+     * @param profileId - The id of the profile to which to save the category for     
+     * @param id - The id of the category
+     * @param name - The id of the profile to which to save the category for
+     * @param callback - An optional callback to call when done (returns error,message)
+     */
+    Zzish.postCategory = function (profileId, id, name, callback) {
+        var data = {
+            uuid: id,
+            name: name,
+        };
+        var request = {
+            method: "POST",
+            url: getBaseUrl() + "profiles/" + profileId + "/categories/" + id,
+            data: data
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, callback);
+        });
+    };
+
+    /**
+     * Delete a Zzish category object
+     * @param profileId - The id of the profile to which to save the category for     
+     * @param id - The id of the category
+     * @param callback - An optional callback to call when done (returns error,message)
+     */
+    Zzish.deleteCategory = function (profileId, id, callback) {
+        var request = {
+            method: "DELETE",
+            url: getBaseUrl() + "profiles/" + profileId + "/categories/" + id
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, callback);
+        });
+    };
+
+    /**
+     * Get a list of Zzish category object
+     * @param profileId - The id of the profile to which to get categorys for
+     * @param callback - A callback to call when done (returns error AND (message or list of zzish,name))
+     */
+    Zzish.listCategories = function (profileId, callback) {
+        var request = {
+            method: "GET",
+            url: getBaseUrl() + "profiles/" + profileId + "/categories"
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, function (status, message) {
+                if (!err) {
+                    callback(err, list);
+                }
+                else {
+                    callback(status, message);
+                }
+            });
+        });
+    };    
 
     /**
      * Publish a content to a group
