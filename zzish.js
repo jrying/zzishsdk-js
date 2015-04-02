@@ -434,8 +434,8 @@
                         callback(404, null);
                     }else{
                         var list = [];
-                        for (var i in data.payload.contents) {
-                            list.push(JSON.parse(data.payload.contents[i]));
+                        for (var i=0;i<data.payload.contents.length;i++) {
+                            list.push(JSON.parse(data.payload.contents[i].payload));
                         }
                         message.contents = list;
                         callback(err, message);
@@ -606,20 +606,27 @@
     /**
      * Save a Zzish content object
      * @param profileId - The id of the profile to which to save the content for     
-     * @param id - The id of the content
-     * @param name - The id of the profile to which to save the content for
      * @param content - The JSON object to save
      * @param callback - An optional callback to call when done (returns error,message)
      */
-    Zzish.postContent = function (profileId, id, name, content, callback) {
+    Zzish.postContent = function (profileId, content, callback) {
         var data = {
-            uuid: id,
-            name: name,
             payload: JSON.stringify(content)
         };
+        if (content.uuid==undefined) {
+            content.uuid = uuid.v4();
+        }
+        data.uuid = content.uuid;
+        if (content.name==undefined) {
+            content.name = "Undefined content" +uuid.v4();            
+        }
+        data.name = content.name;
+        if (content.categoryId!=undefined) {
+            data.categoryId = content.categoryId;
+        }
         var request = {
             method: "POST",
-            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + id,
+            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + data.uuid,
             data: data
         };
         sendData(request, function (err, data) {
@@ -646,7 +653,7 @@
     /**
      * Get a Zzish content object
      * @param profileId - The id of the profile to which to get the content for
-     * @param content - The Zzish content (JSON)
+     * @param uuid - THe uuid to get 
      * @param callback - A callback to call when done (returns error AND (message or data))
      */
     Zzish.getContent = function (profileId, uuid, callback) {
@@ -658,6 +665,66 @@
             callCallBack(err, data, function (status, message) {
                 if (!err) {
                     callback(err, JSON.parse(data.payload.payload));
+                }
+                else {
+                    callback(status, message);
+                }
+            });
+        });
+    };
+
+
+    /**
+     * Get a Zzish content object (as a consumer)
+     * @param profileId - The id of the profile to which to get the content for
+     * @param uuid - The Zzish content (JSON)
+     * @param callback - A callback to call when done (returns error AND (message or data))
+     */
+    Zzish.getConsumerContent = function (profileId, uuid, callback) {
+        var request = {
+            method: "GET",
+            url: getBaseUrl() + "profiles/" + profileId + "/consumers/" + uuid
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, function (status, message) {
+                if (!err) {
+                    callback(err, JSON.parse(data.payload.payload));
+                }
+                else {
+                    callback(status, message);
+                }
+            });
+        });
+    };
+
+    /**
+     * Get a list of Zzish content object
+     * @param profileId - The id of the profile to which to get contents for
+     * @param callback - A callback to call when done (returns error AND (message or list of zzish,name))
+     */
+    Zzish.listPublicContent = function (profileId, callback) {
+        var request = {
+            method: "GET",
+            url: getBaseUrl() + "profiles/" + profileId + "/consumers/public"
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, function (status, message) {
+                if (!err) {
+                    var list = [];
+                    var resultList = data.payload;
+                    if (data){
+                        for (var i in resultList.contents) {
+                            var json = resultList.contents[i];
+                            var result = {
+                                uuid: json.uuid,
+                                name: json.name,
+                                categoryId: json.categoryId,
+                            };
+                            list.push(result);
+                        }
+                        resultList.contents = list;
+                    }
+                    callback(err, resultList);
                 }
                 else {
                     callback(status, message);
@@ -684,6 +751,7 @@
                         for (var i in data.payload) {
                             var result = {
                                 uuid: data.payload[i].uuid,
+                                categoryId: data.payload[i].categoryId,
                                 name: data.payload[i].name
                             };
                             list.push(result);
@@ -702,19 +770,14 @@
     /**
      * Save a Zzish category object
      * @param profileId - The id of the profile to which to save the category for     
-     * @param id - The id of the category
-     * @param name - The id of the profile to which to save the category for
+     * @param category - The category object
      * @param callback - An optional callback to call when done (returns error,message)
      */
-    Zzish.postCategory = function (profileId, id, name, callback) {
-        var data = {
-            uuid: id,
-            name: name,
-        };
+    Zzish.postCategory = function (profileId, category, callback) {
         var request = {
             method: "POST",
             url: getBaseUrl() + "profiles/" + profileId + "/categories/",
-            data: data
+            data: category
         };
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
