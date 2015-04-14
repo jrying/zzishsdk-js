@@ -719,6 +719,7 @@
                                 uuid: json.uuid,
                                 name: json.name,
                                 categoryId: json.categoryId,
+                                order: json.order
                             };
                             list.push(result);
                         }
