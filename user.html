@@ -14,8 +14,6 @@
         var profileId;
         var init = false;
         var token = null;
-        var wso2Enabled = false;
-        var localEnabled = false;
 
         $(document).ready(function() {
             logoutUser();
@@ -42,8 +40,15 @@
         function initApp() {
             if (!init) {
                 if ($("#appId").val()!="") {
-                    Zzish.debugState(localEnabled,wso2Enabled);
-                    Zzish.init($("#appId").val());
+                    Zzish.init({
+                        api: $("#appId").val(),
+                        protocol: "http",
+                        baseUrl: "localhost:8080/zzishapi/api/",
+                        webUrl: "http://localhost:3000/",
+                        header: "X-ApplicationId",
+                        headerprefix: "",
+                        logEnabled: true
+                    });
                     init = true;    
                     console.log("App Initalized with id",$("#appId").val());
                     Zzish.getCurrentUser(null,function(err,data) {

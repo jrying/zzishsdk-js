@@ -13,8 +13,6 @@
     <script>
         var activityId; 
         var init = false;
-        var wso2Enabled = false;
-        var localEnabled = false;        
         //set to true to use a stateless version of the SDK
         var stateless = false;
         var deviceId = "DEVICE_ID";
@@ -23,7 +21,6 @@
         function initApp() {
             if (!init) {
                 if ($("#appId").val()!="") {
-                    Zzish.debugState(localEnabled,wso2Enabled);
                     Zzish.init($("#appId").val());
                     init = true;    
                     console.log("App Initalized with id",$("#appId").val());
