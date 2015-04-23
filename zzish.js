@@ -24,25 +24,16 @@
     var defaultProtocol = "https://";
     var baseUrl = "api.zzish.com/";
     var webUrl = "https://www.zzish.com/"
-    var logEnabled = true;
-    //make SDK stateless to test
-    
+    var logEnabled = false;
     var header = "Authorization";    
     var headerprefix = "Bearer ";        
     var makeStateless = false;
-    var defaultLocalEnabled = false;
-    var defaultWso2Enabled = false;
     
     function isIE8() {
         if (stateful()) {
             return (window!=undefined && window.XDomainRequest) ? true : false;    
         }
         return false;    
-    }
-
-    Zzish.debugState = function(l1,w1) {
-        localStateSet = l1;
-        wso2 = w1;
     }
 
     function getBaseUrl() {        
@@ -82,10 +73,15 @@
         return params;
     }
 
+    function getConfigValue(config,field,originalValue) {
+        if (config[field]!=undefined) return config[field];
+        return originalValue;
+    }
+
     /**
      * Initialise Zzish instance
      */
-    Zzish.init = function (applicationId) {
+    Zzish.init = function (config) {
         //generate a device if we don't have one
         if (stateful()) {
             deviceId = localStorage.getItem("deviceId");
@@ -94,35 +90,23 @@
                 localStorage.setItem("deviceId", deviceId);
             }
         }
-        appId = applicationId;
-        try {
-            if (localStateSet!=undefined && localStateSet) {
-                defaultProtocol = "http://"
-                baseUrl = "localhost:8080/zzishapi/api/";  
-                webUrl = "http://localhost:3000/";
-                header = "X-ApplicationId";    
-                headerprefix = "";    
-                logEnabled = true;
-            }
+        if (typeof config =='string') {
+            appId = config;    
         }
-        catch (err) {
-
-        }
-        try {
-            if (wso2!=undefined && wso2=="true") {
-                header = "Authorization";
-                headerprefix = "Bearer ";
-            }
-        }
-        catch (err) {
-
+        else if (typeof config =='object') {
+            appId = getConfigValue(config,'api');    
+            defaultProtocol = getConfigValue(config,'protocol',defaultProtocol);
+            baseUrl = getConfigValue(config,'baseUrl',baseUrl);
+            webUrl = getConfigValue(config,'webUrl',webUrl);
+            header = getConfigValue(config,'header',header);
+            headerprefix = getConfigValue(config,'headerprefix',headerprefix);
+            logEnabled = getConfigValue(config,'logEnabled',logEnabled);
         }        
     };
 
     var params = getQueryParams();
 
     if (params["zzishtoken"]!=undefined) {
-        Zzish.debugState(defaultLocalEnabled,defaultWso2Enabled);
         localStorage.setItem("zzishtoken",params["zzishtoken"]);
         Zzish.init(params["zzishtoken"]);
     }
