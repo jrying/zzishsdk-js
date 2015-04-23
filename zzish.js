@@ -322,7 +322,7 @@
         action.definition = parameters.definition;
         if (parameters.attributes != undefined && parameters.attributes != "") {
             action.state = {};
-            if (attributes["proficiency"]!=undefined) {
+            if (parameters.attributes["proficiency"]!=undefined) {
                 proficiency = parameters.attributes["proficiency"];
                 delete parameters.attributes["proficiency"];
                 action.state["proficiency"]=proficiency;
@@ -332,7 +332,12 @@
                 found = true;
             }
             if (found) {
-                action.state["attributes"] = JSON.parse(parameters.attributes);
+                if (typeof(parameters.attributes) == 'string') {
+                    action.state["attributes"] = JSON.parse(parameters.attributes);
+                }
+                else {
+                    action.state["attributes"] = parameters.attributes;
+                }
             }
         }
         sendMessage({
@@ -719,7 +724,7 @@
                                 uuid: json.uuid,
                                 name: json.name,
                                 categoryId: json.categoryId,
-                                order: json.order
+                                order: json.index
                             };
                             list.push(result);
                         }
