@@ -14,15 +14,19 @@
         var userId;
         var init = false;
 
-        var wso2Enabled = false;
-        var localEnabled = false;
-
-
         function initApp() {
             if (!init) {
                 if ($("#appId").val()!="") {                    
-                    Zzish.debugState(localEnabled,wso2Enabled);
-                    Zzish.init($("#appId").val());
+                    Zzish.init({
+                        api: $("#appId").val(),
+                        protocol: "http://",
+                        baseUrl: "localhost:8080/zzishapi/api/",
+                        webUrl: "http://localhost:3000/",
+                        header: "X-ApplicationId",
+                        headerprefix: "",
+                        logEnabled: true
+                    });
+                    //Zzish.init($("#appId").val());
                     init = true;    
                     console.log("App Initalized with id",$("#appId").val());
                 }
@@ -47,7 +51,12 @@
             if (initApp()) {            
                 //postContent = function(profileId,id,name,content,callback)
                 var JSON_val = JSON.parse($("#cjson").val());
-                Zzish.postContent(userId,$("#cid").val(),$("#cname").val(),JSON_val,function(err,message) {
+                var content = {
+                    uuid: $("#cid").val(),
+                    name: $("#cname").val(),
+                    payload: JSON_val
+                };
+                Zzish.postContent(userId,content,function(err,message) {
                     console.log("Content created with status" + err);    
                 });
             }
@@ -77,16 +86,38 @@
             }
         } 
 
-        function publishContentToGroup() {
+        function publishContent() {
             if (initApp()) {     
-                Zzish.publishContent(userId,$("#pemail").val(),$("#pid").val(),$("#pcode").val(),function(err,message) {
+                Zzish.publishContentToGroup(userId,$("#pemail").val(),$("#pid").val(),$("#pcode").val(),function(err,message) {
                     $("#publishContentOutput").html(JSON.stringify(message));
                 });
             }
             else {
                 alert ("Please init with your APP_ID from http://www.zzish.co.uk/developer/")
             }
-        }          
+        }  
+
+        function unpublishContent() {
+            if (initApp()) {     
+                Zzish.unpublishContent(userId,$("#pid").val(),$("#pcode").val(),function(err,message) {
+                    $("#publishContentOutput").html(JSON.stringify(message));
+                });
+            }
+            else {
+                alert ("Please init with your APP_ID from http://www.zzish.co.uk/developer/")
+            }
+        }   
+
+        function republishContent() {
+            if (initApp()) {     
+                Zzish.republishContent(userId,$("#pid").val(),$("#pcode").val(),function(err,message) {
+                    $("#publishContentOutput").html(JSON.stringify(message));
+                });
+            }
+            else {
+                alert ("Please init with your APP_ID from http://www.zzish.co.uk/developer/")
+            }
+        }                 
     </script>
 </head>
 
@@ -118,11 +149,14 @@
 <input type="text" id="pemail" name="pemail" placeholder="Email Address of Creator" value=""/><br/>
 <input type="text" id="pcode" name="pcode" placeholder="Group Code" value=""/><br/>
 <input type="button" onclick="publishContent()" value="Publish Content"/><br/>
+<input type="button" onclick="unpublishContent()" value="Unpublish Content"/><br/>
+<input type="button" onclick="republishContent()" value="Republish Content"/><br/>
 <h2>Output</h2>
 <div id="publishContentOutput"></div>
 <h1>Delete Content</h1>
 <input type="text" id="dcid" name="dcid" placeholder="Content Id" value=""/><br/>
 <input type="button" onclick="deleteContent()" value="Delete Content"/><br/>
+<input type="button" onclick="publishContent()" value="Publish Content"/><br/>
 
 </body>
 </html>

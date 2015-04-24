@@ -742,7 +742,8 @@
                             var result = {
                                 uuid: data.payload[i].uuid,
                                 categoryId: data.payload[i].categoryId,
-                                name: data.payload[i].name
+                                name: data.payload[i].name,
+                                enabled: data.payload[i].enabled==null || data.payload[i].enabled 
                             };
                             list.push(result);
                         }
@@ -830,6 +831,42 @@
             callCallBack(err, data, callback);
         });
     };
+
+    /**
+     * UnPublish a content
+     * @param profileId - The id of the profile to which to get contents for
+     * @param uuid - The email of the person so we can send them a link to register their account so they can access the group
+     * @param groupCode - The Zzish code of an existing class
+     * @param callback - A callback to call when done (returns error AND (message or list of zzish,name))
+     */
+    Zzish.unpublishContent  = function (profileId, uuid, groupCode, callback) {
+        var request = {
+            method: "POST",
+            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + uuid + "/" + groupCode + "/unpublish",
+            data: {}
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, callback);
+        });
+    };
+
+    /**
+     * RePublish a content
+     * @param profileId - The id of the profile to which to get contents for
+     * @param uuid - The email of the person so we can send them a link to register their account so they can access the group
+     * @param groupCode - The Zzish code of an existing class
+     * @param callback - A callback to call when done (returns error AND (message or list of zzish,name))
+     */
+    Zzish.republishContent  = function (profileId, uuid, groupCode,callback) {
+        var request = {
+            method: "POST",
+            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + uuid + "/" + groupCode + "/republish",
+            data: {}
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, callback);
+        });
+    };    
 
 /**** USER STUFF ***/
 
