@@ -708,7 +708,8 @@
                                 uuid: json.uuid,
                                 name: json.name,
                                 categoryId: json.categoryId,
-                                order: json.index
+                                order: json.index,
+                                publicAssigned: true
                             };
                             list.push(result);
                         }
@@ -722,6 +723,74 @@
             });
         });
     };
+
+    /**
+     * Unassign public content
+     * @param profileId - The id of the profile to which to get contents for
+     * @param groupCode - The groupCode fot the class
+     * @param uuid - The content uuid
+     * @param callback - A callback to call when done (returns error AND (message or list of zzish,name))
+     */
+    Zzish.unassignPublicContent = function(profileId, groupCode, uuid, callback) {
+        var request = {
+            method: "POST",
+            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + groupCode + "/public/" + uuid + "/delete",
+            data: {}
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, callback);
+        });
+    };
+    
+    /**
+     * Get a list of Zzish content object
+     * @param profileId - The id of the profile to which to get contents for
+     * @param groupCode - The groupCode fot the class
+     * @param callback - A callback to call when done (returns error AND (message or list of zzish,name))
+     */
+    Zzish.getAssignedPublicContents = function(profileId, groupCode, callback) {
+        var request = {
+            method: "GET",
+            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + groupCode + "/public/assigned"
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, function (status, message) {
+                if (!err) {
+                    var list = [];
+                    if (data){
+                        if (Array.isArray(data.payload)) {
+                            for (var i in data.payload) {
+                                var json = data.payload[i];
+                                var result = {
+                                    uuid: json.uuid,
+                                    name: json.name,
+                                    categoryId: json.categoryId,
+                                    order: json.index,
+                                    publicAssigned: true
+                                };
+                                list.push(result);
+                            }
+                        }
+                        else {
+                            var result = {
+                                    uuid: data.payload.uuid,
+                                    name: data.payload.name,
+                                    categoryId: data.payload.categoryId,
+                                    order: data.payload.index,
+                                    publicAssigned: true
+                                };
+                            list.push(result);
+                        }                                                
+                    }
+                    callback(err, list);
+                }
+                else {
+                    callback(status, message);
+                }
+            });
+        });
+    };
+
 
     /**
      * Get a list of Zzish content object
@@ -809,23 +878,17 @@
     /**
      * Publish a content to a group
      * @param profileId - The id of the profile to which to get contents for
-     * @param email - The email of the person so we can send them a link to register their account so they can access the group
-     * @param zzish - The zzish of the content
-     * @param code - The Zzish code of an existing class (optional)
+     * @param id - The id of the content
+     * @param options-email - The email of the person so we can send them a link to register their account so they can access the group
+     * @param options-code - The Zzish code of an existing class (optional)
+     * @param options-access - the number of times a user can access the publish
      * @param callback - A callback to call when done (returns error AND (message or list of zzish,name))
      */
-    Zzish.publishContentToGroup = function (profileId, email, uuid, code, callback) {
-        var data = {};
-        if (code!=undefined && code!='') {
-            data['code'] = code;
-        }
-        if (email!=undefined && email!='') {
-            data['email'] = email;
-        }
+    Zzish.publishContentToGroup = function (profileId, uuid, options, callback) {
         var request = {
             method: "POST",
             url: getBaseUrl() + "profiles/" + profileId + "/contents/" + uuid + "/publish",
-            data: data
+            data: options
         };
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
