@@ -420,6 +420,7 @@
             for (var i=0;i<message.contents.length;i++) {
                 var item = JSON.parse(message.contents[i].payload);
                 item.publicAssigned = false;
+                item.attributes = message.contents[i].attributes;
                 list.push(item);
             }                            
         }
