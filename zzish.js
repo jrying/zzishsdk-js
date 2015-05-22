@@ -423,7 +423,6 @@
                 if (item.categoryId==undefined && message.contents[i].categoryId!=undefined) {
                     item.categoryId = message.contents[i].categoryId;    
                 }                
-                item.attributes = message.contents[i].attributes;
                 list.push(item);
             }                            
         }
@@ -868,12 +867,29 @@
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
                 if (!err) {
-                    callback(err, JSON.parse(data.payload.payload));
+                    var item = JSON.parse(data.payload.payload);
+                    callback(err,item);
                 }
                 else {
                     callback(status, message);
                 }
             });
+        });
+    };
+
+    /**
+     * Get results for Zzish content object
+     * @param profileId - The id of the profile to which to get the content for
+     * @param uuid - THe uuid to get 
+     * @param callback - A callback to call when done (returns error AND (message or data))
+     */
+    Zzish.getContentResults = function (profileId, uuid, callback) {
+        var request = {
+            method: "GET",
+            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + uuid+"/results"
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, callback);
         });
     };
 
@@ -938,15 +954,8 @@
                     var resultList = data.payload;
                     if (data){
                         for (var i in resultList.contents) {
-                            var json = resultList.contents[i];
-                            var result = {
-                                uuid: json.uuid,
-                                name: json.name,
-                                categoryId: json.categoryId,
-                                order: json.index,
-                                publicAssigned: true
-                            };
-                            list.push(result);
+                            var json = JSON.parse(resultList.contents[i].payload);
+                            list.push(json);
                         }
                         resultList.contents = list;
                     }
