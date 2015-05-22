@@ -954,14 +954,7 @@
                     var resultList = data.payload;
                     if (data){
                         for (var i in resultList.contents) {
-                            var json = resultList.contents[i];
-                            var result = {
-                                uuid: json.uuid,
-                                name: json.name,
-                                categoryId: json.categoryId,
-                                order: json.index,
-                                publicAssigned: true
-                            };
+                            var json = JSON.parse(resultList.contents[i].payload);
                             list.push(result);
                         }
                         resultList.contents = list;
