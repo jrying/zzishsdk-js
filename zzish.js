@@ -955,7 +955,7 @@
                     if (data){
                         for (var i in resultList.contents) {
                             var json = JSON.parse(resultList.contents[i].payload);
-                            list.push(result);
+                            list.push(json);
                         }
                         resultList.contents = list;
                     }
