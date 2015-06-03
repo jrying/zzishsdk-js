@@ -1089,8 +1089,11 @@
 /**** USER STUFF ***/
 
 
-    function loadLoginWithToken(type,token,callback) {
-        var url = webUrl + 'account/login?token=' + token;
+    function loadLoginWithToken(type,params,callback) {
+        var url = webUrl + 'account/login?1=1';
+        for (var i in params) {
+            url = url + "&"+i + "=" + params[i];
+        }
         if (type=="pop") {                    
             var win = window.open(url, 'Zzish Login', 'width=800, height=600');
             var pollTimer = window.setInterval(
@@ -1113,25 +1116,30 @@
     /**
      * Login to Zzish
      * @param type - "pop" (default) will do a popup. "redirect" will go to zzish and then come back
-     * @param successUrl - A URL hosted on the domain you are calling so that it can monitor success (will redirect to this page after succesful login and then close the page)
+     * @param options - a list of optinos for login
+          redirectURL -  A URL hosted on the domain you are calling so that it can monitor success (will redirect to this page after succesful login and then close the page)
      * @param callback - A callback to call when done (returns error AND (message or user))
      */
-    Zzish.login = function (type,successUrl,callback) {
+    Zzish.login = function (type,options,callback) {
         if (stateful()) {
             //check if we already have a token
             token = localStorage.getItem("token");
+        }
+        if (options==undefined) {
+            options = {};
         }
         if (token==undefined) {
             var token_request = {
                 method: "POST",
                 url: getBaseUrl() + "profiles/tokens",
-                data: { redirectURL: successUrl }
+                data: { options: options }
             }
             //create a token first
             sendData(token_request, function (err, data) {
                     callCallBack(err, data, function(err,token) {
+                    options['token']=token;
                     localStorage.setItem("token",token);
-                    loadLoginWithToken(type,token,callback);
+                    loadLoginWithToken(type,options,callback);
                 });
             });
         }
