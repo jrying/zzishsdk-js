@@ -1091,6 +1091,7 @@
 
     function loadLoginWithToken(type,params,callback) {
         var url = webUrl + 'account/login?1=1';
+        delete params['redirectURL'];
         for (var i in params) {
             url = url + "&"+i + "=" + params[i];
         }
