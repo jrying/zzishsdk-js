@@ -1,6 +1,6 @@
 {
   "name": "zzishsdk",
-  "version": "0.1.29",
+  "version": "0.1.31",
   "description": "SDK for Zzish API",
   "main": "zzish.js",
   "scripts": {

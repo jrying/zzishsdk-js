@@ -33,7 +33,7 @@
     var makeStateless = false;
     
     function getBaseUrl() {        
-        if (window!=undefined && window.location!=undefined && window.location.href!=undefined) {
+        if (stateful() && window!=undefined && window.location!=undefined && window.location.href!=undefined) {
             var url = window.location.href;
             if (url!=undefined) {
                 var arr = url.split("/");
@@ -883,11 +883,12 @@
         if (message.contents!=undefined) {
             for (var i=0;i<message.contents.length;i++) {
                 var item = JSON.parse(message.contents[i].payload);
-                item.publicAssigned = false;
-                if (item.categoryId==undefined && message.contents[i].categoryId!=undefined) {
-                    item.categoryId = message.contents[i].categoryId;    
-                }                
-                list.push(item);
+                if (item !== null) {
+                    if (item.categoryId==undefined && message.contents[i].categoryId!=undefined) {
+                        item.categoryId = message.contents[i].categoryId;    
+                    }                
+                    list.push(item);
+                }
             }                            
         }
         message.contents = list;
@@ -988,10 +989,11 @@
             callCallBack(err, data, function (status, message) {
                 if (!err) {
                     var item = JSON.parse(data.payload.payload);
-                    if (item.categoryId==undefined && data.payload.categoryId!=undefined) {
-                        item.categoryId=data.payload.categoryId;
+                    if (item !== null) {
+                        if (item.categoryId==undefined && data.payload.categoryId!=undefined) {
+                            item.categoryId=data.payload.categoryId;
+                        }
                     }
-                    item.publicAssigned = true;
                     callback(err, item);
                 }
                 else {
@@ -1083,7 +1085,7 @@
 
 
     function loadLoginWithToken(type,params,callback) {
-        var url = webUrl + 'account/login?1=1';
+        var url = webUrl + 'account/applogin?1=1';
         delete params['redirectURL'];
         for (var i in params) {
             url = url + "&"+i + "=" + params[i];
