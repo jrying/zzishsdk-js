@@ -32,15 +32,8 @@
     var headerprefix = "Bearer ";        
     var makeStateless = false;
     
-    function isIE8() {
-        if (stateful()) {
-            return (window!=undefined && window.XDomainRequest) ? true : false;    
-        }
-        return false;    
-    }
-
     function getBaseUrl() {        
-        if (isIE8() && window!=undefined && window.location!=undefined && window.location.href!=undefined) {
+        if (window!=undefined && window.location!=undefined && window.location.href!=undefined) {
             var url = window.location.href;
             if (url!=undefined) {
                 var arr = url.split("/");
@@ -1210,13 +1203,7 @@
             request.method = "POST";
         }
         if (logEnabled) console.log('Proxy.request ',request);
-        if (isIE8()) {
-            req = new window.XDomainRequest();
-            ocallback = callback;
-        }
-        else {
-            req = new XMLHttpRequest();
-        }
+        req = new XMLHttpRequest();
         if(req.addEventListener){
             req.addEventListener('load', function () {
             response(this, callback, logEnabled);
