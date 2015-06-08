@@ -976,6 +976,21 @@
 
 
     /**
+     * Get results for Zzish public content object
+     * @param uuid - THe uuid to get 
+     * @param callback - A callback to call when done (returns error AND (message or data))
+     */
+    Zzish.getPublicContentResults = function (uuid, callback) {
+        var request = {
+            method: "GET",
+            url: getBaseUrl() + "profiles/publicconsumers/" + uuid+"/results"
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, callback);
+        });
+    };
+
+    /**
      * Get a Zzish public content object (as a consumer)
      * @param uuid - The Zzish content (JSON)
      * @param callback - A callback to call when done (returns error AND (message or data))
