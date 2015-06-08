@@ -1,5 +1,4 @@
 // Global Zzish object
-
 (function () {
 
 
@@ -696,10 +695,11 @@
     /**
      * Save a Zzish content object
      * @param profileId - The id of the profile to which to save the content for     
+     * @param type - The content type
      * @param content - The JSON object to save
      * @param callback - An optional callback to call when done (returns error,message)
      */
-    Zzish.postContent = function (profileId, content, callback) {
+    Zzish.postContent = function (profileId, type, content, callback) {
         var data = {
             payload: JSON.stringify(content)
         };
@@ -716,7 +716,7 @@
         }
         var request = {
             method: "POST",
-            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + data.uuid,
+            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + type + "/" + data.uuid,
             data: data
         };
         sendData(request, function (err, data) {
@@ -727,13 +727,14 @@
     /**
      * Delete a Zzish content object
      * @param profileId - The id of the profile to which to save the content for     
+     * @param type - The content type
      * @param id - The id of the content
      * @param callback - An optional callback to call when done (returns error,message)
      */
-    Zzish.deleteContent = function (profileId, id, callback) {
+    Zzish.deleteContent = function (profileId, type, id, callback) {
         var request = {
             method: "DELETE",
-            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + id
+            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + type + "/" + id
         };
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
@@ -743,13 +744,14 @@
     /**
      * Get a Zzish content object
      * @param profileId - The id of the profile to which to get the content for
+     * @param type - The content type
      * @param uuid - THe uuid to get 
      * @param callback - A callback to call when done (returns error AND (message or data))
      */
-    Zzish.getContent = function (profileId, uuid, callback) {
+    Zzish.getContent = function (profileId, type, uuid, callback) {
         var request = {
             method: "GET",
-            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + uuid
+            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + type + "/" + uuid
         };
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
@@ -766,10 +768,11 @@
 
     /**
      * Get a Zzish content object by code
+     * @param type - The content type
      * @param code - The content code
      * @param callback - A callback to call when done (returns error AND (message or data))
      */
-    Zzish.getContentByCode = function (code, callback) {
+    Zzish.getContentByCode = function (type,code, callback) {
         var request = {
             method: "GET",
             url: getBaseUrl() + "profiles/publicconsumers/code/" + code
@@ -789,14 +792,15 @@
     /**
      * Get a Zzish content objects
      * @param profileId - The id of the profile to which to get the content for
-     * @param uuisd - An array of uuid
+     * @param type - The content type
+     * @param uuids - An array of uuid
      * @param callback - A callback to call when done (returns error AND (message or data))
      */
-    Zzish.getContents = function (profileId, uuids, callback) {
+    Zzish.getContents = function (profileId, type,uuids, callback) {
         var input = { uuids: uuids };
         var request = {
             method: "POST",
-            url: getBaseUrl() + "profiles/" + profileId + "/contents/list",
+            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + type + "/list",
             data: input
         };
         sendData(request, function (err, data) {
@@ -807,12 +811,13 @@
     /**
      * Get a list of Zzish content object
      * @param profileId - The id of the profile to which to get contents for
+     * @param type - The content type
      * @param callback - A callback to call when done (returns error AND (message or list of zzish,name))
      */
-    Zzish.listContent = function (profileId, callback) {
+    Zzish.listContent = function (profileId, type, callback) {
         var request = {
             method: "GET",
-            url: getBaseUrl() + "profiles/" + profileId + "/contents"
+            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + type
         };
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
@@ -839,7 +844,8 @@
     /**
      * Publish a content to a group
      * @param profileId - The id of the profile to which to get contents for
-     * @param id - The id of the content
+     * @param type - The content type
+     * @param uuid - The id of the content
      * @param options-email - The email of the person so we can send them a link to register their account so they can access the group
      * @param options-code - The Zzish code of an existing class (optional)
      * @param options-access - the number of times a user can access the publish
@@ -847,10 +853,10 @@
      * @param options-public - whether to make the content public
      * @param callback - A callback to call when done (returns error AND (message or list of zzish,name))
      */
-    Zzish.publishContent = function (profileId, uuid, options, callback) {
+    Zzish.publishContent = function (profileId, type, uuid, options, callback) {
         var request = {
             method: "POST",
-            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + uuid + "/publish",
+            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + type + "/" + uuid + "/publish",
             data: options
         };
         sendData(request, function (err, data) {
@@ -861,14 +867,15 @@
     /**
      * UnPublish a content
      * @param profileId - The id of the profile to which to get contents for
+     * @param type - The content type
      * @param uuid - The email of the person so we can send them a link to register their account so they can access the group
      * @param groupCode - The Zzish code of an existing class
      * @param callback - A callback to call when done (returns error AND (message or list of zzish,name))
      */
-    Zzish.unpublishContent  = function (profileId, uuid, groupCode, callback) {
+    Zzish.unpublishContent  = function (profileId, type, uuid, groupCode, callback) {
         var request = {
             method: "POST",
-            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + uuid + "/" + groupCode + "/unpublish",
+            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + type + "/" + uuid + "/" + groupCode + "/unpublish",
             data: {}
         };
         sendData(request, function (err, data) {
@@ -961,13 +968,14 @@
     /**
      * Get results for Zzish content object
      * @param profileId - The id of the profile to which to get the content for
+     * @param type - The content type
      * @param uuid - THe uuid to get 
      * @param callback - A callback to call when done (returns error AND (message or data))
      */
-    Zzish.getContentResults = function (profileId, uuid, callback) {
+    Zzish.getContentResults = function (profileId, type, uuid, callback) {
         var request = {
             method: "GET",
-            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + uuid+"/results"
+            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + type + "/" + uuid+"/results"
         };
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
@@ -977,13 +985,14 @@
 
     /**
      * Get results for Zzish public content object
+     * @param type - The content type
      * @param uuid - THe uuid to get 
      * @param callback - A callback to call when done (returns error AND (message or data))
      */
-    Zzish.getPublicContentResults = function (uuid, callback) {
+    Zzish.getPublicContentResults = function (type, uuid, callback) {
         var request = {
             method: "GET",
-            url: getBaseUrl() + "profiles/publicconsumers/" + uuid+"/results"
+            url: getBaseUrl() + "profiles/publicconsumers/" + type + "/" + uuid+"/results"
         };
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
@@ -992,13 +1001,14 @@
 
     /**
      * Get a Zzish public content object (as a consumer)
+     * @param type - The content type
      * @param uuid - The Zzish content (JSON)
      * @param callback - A callback to call when done (returns error AND (message or data))
      */
-    Zzish.getPublicContent = function (uuid, callback) {
+    Zzish.getPublicContent = function (type,uuid, callback) {
         var request = {
             method: "GET",
-            url: getBaseUrl() + "profiles/publicconsumers/" + uuid
+            url: getBaseUrl() + "profiles/publicconsumers/" + type + "/" + uuid
         };
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
@@ -1020,12 +1030,13 @@
 
     /**
      * Get a list of Zzish content object
+     * @param type - The content type
      * @param callback - A callback to call when done (returns error AND (message or list of zzish,name))
      */
-    Zzish.listPublicContent = function (callback) {
+    Zzish.listPublicContent = function (type,callback) {
         var request = {
             method: "GET",
-            url: getBaseUrl() + "profiles/publicconsumers/"
+            url: getBaseUrl() + "profiles/publicconsumers/" + type
         };
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
