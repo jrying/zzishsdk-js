@@ -175,6 +175,25 @@
     };
 
     /**
+     * Save the User (if the id is the same as the current one, returns the current user)
+     *
+     * @param id - A unique Id for the user (required)
+     * @param user - The user object to save
+     * @param callback - An optional callback after user has been saved on server
+     * @return The user (returns a server user if it already exists). If it's the current User, returns that user
+     */
+    Zzish.saveUser = function (id, user, callback) {
+        var request = {
+            method: "POST",
+            url: getBaseUrl() + "profiles",
+            data: user
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, callback);
+        })
+    };
+
+    /**
      * Start Activity with name
      *
      * @param userId - The userId of the user (required)
@@ -756,8 +775,13 @@
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
                 if (!err) {
-                    var item = JSON.parse(data.payload.payload);
-                    callback(err,item);
+                    if (data.payload!==undefined && data.payload.payload!==undefined && data.payload.payload!="") {
+                        var item = JSON.parse(data.payload.payload);    
+                        callback(err,item);
+                    }
+                    else {
+                        callback("Invalid Data");
+                    }                    
                 }
                 else {
                     callback(status, message);
