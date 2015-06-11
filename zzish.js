@@ -27,16 +27,16 @@
     var baseUrl = "api.zzish.com/";
     var webUrl = "https://www.zzish.com/"
     var logEnabled = false;
-    var header = "Authorization";    
-    var headerprefix = "Bearer ";        
+    var header = "Authorization";
+    var headerprefix = "Bearer ";
     var makeStateless = false;
-    
-    function getBaseUrl() {        
+
+    function getBaseUrl() {
         if (stateful() && window!=undefined && window.location!=undefined && window.location.href!=undefined) {
             var url = window.location.href;
             if (url!=undefined) {
                 var arr = url.split("/");
-                return arr[0] + "//" + baseUrl;                
+                return arr[0] + "//" + baseUrl;
             }
         }
         return defaultProtocol + baseUrl;
@@ -86,20 +86,20 @@
                 localStorage.setItem("deviceId", deviceId);
             }
         }
-        if (typeof config =='string') {    
+        if (typeof config =='string') {
             try
             {
                 config = JSON.parse(config);
                 Zzish.init(config);
             }
             catch (err) {
-                appId = config;    
-                if (stateful()) localStorage.setItem("appConfig",config);    
+                appId = config;
+                if (stateful()) localStorage.setItem("appConfig",config);
             }
-            
+
         }
         else if (typeof config =='object') {
-            appId = getConfigValue(config,'api');    
+            appId = getConfigValue(config,'api');
             defaultProtocol = getConfigValue(config,'protocol',defaultProtocol);
             baseUrl = getConfigValue(config,'baseUrl',baseUrl);
             webUrl = getConfigValue(config,'webUrl',webUrl);
@@ -107,21 +107,21 @@
             headerprefix = getConfigValue(config,'headerprefix',headerprefix);
             logEnabled = getConfigValue(config,'logEnabled',logEnabled);
             if (stateful()) localStorage.setItem("appConfig",JSON.stringify(config));
-        }        
+        }
     };
 
-    
+
     var params = getQueryParams();
     if (params["zzishtoken"]!=null) {
         Zzish.init(params["zzishtoken"]);
     }
     if (params["cancel"]!=undefined) {
         localStorage.removeItem("token");
-    }    
+    }
 
 
 
-/**** SERVER SIDE (NO STATE) *****/  
+/**** SERVER SIDE (NO STATE) *****/
 
     /**
      * Presets the deviceId and SessionId which the developer stores if there is not state to store that info
@@ -167,7 +167,7 @@
             }
             else {
                 callCallBack(null, {status: 200, payload: currentUser}, callback);
-            }            
+            }
         }
         else {
             Zzish.createUser(id,name,callback);
@@ -206,7 +206,7 @@
         var parameters = {
             activityDefinition: {
                 type: activityName
-            },            
+            },
             extensions: {
                 groupCode: code
             }
@@ -232,10 +232,10 @@
         var message = {
             verb: "http://activitystrea.ms/schema/1.0/start",
             activityUuid: aid
-        };        
+        };
         sendMessage(message, parameters,callback);
         return aid;
-    };    
+    };
 
     /**
      * stop Activity with aid
@@ -251,17 +251,17 @@
         if (states!=undefined && states.proficiency!=undefined) {
             pro = states.proficiency;
             delete states.proficiency;
-        }       
+        }
         var stateMap = {
             states: states
-        } 
+        }
         if (pro!=undefined) {
             stateMap.proficiency = pro;
             haveState = true;
-        }   
+        }
         for (i in states) {
             haveState = true;
-        }      
+        }
         sendMessage({
              verb: "http://activitystrea.ms/schema/1.0/complete",
              activityUuid: activityId
@@ -351,7 +351,7 @@
             verb: "http://activitystrea.ms/schema/1.0/start",
             activityUuid: activityId,
             actions: [action]
-        }, parameters, callback);        
+        }, parameters, callback);
     }
 
     /**
@@ -480,8 +480,8 @@
      */
     Zzish.validateClassCode = function (code) {
         if (code!=undefined && code.length>1) {
-            var charLast = code.slice(-1);           
-            var total = 0; 
+            var charLast = code.slice(-1);
+            var total = 0;
             for (counter=0;counter<code.length-1;counter++) {
                 total+=code.charCodeAt(counter);
             }
@@ -490,12 +490,12 @@
                 return true;
             }
         }
-        return false;      
+        return false;
     };
 
     /**
-     * Authenticate user based on name and classcode. 
-     * Returns 409 if user has logged in on a different device with the same name 
+     * Authenticate user based on name and classcode.
+     * Returns 409 if user has logged in on a different device with the same name
      * within a specied period (see error message for details)
      *
      * @param id - A unique Id for the user (required)
@@ -530,7 +530,7 @@
      * @param id - A unique Id for the user (required)
      * @param callback - An optional callback after user has been saved on server
      */
-     
+
     Zzish.unauthUser = function (id,  callback) {
         var request = {
             method: "POST",
@@ -602,14 +602,14 @@
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
         })
-    };    
+    };
 
 
 /**** USER MANAGEMENT *****/
 
-    /** 
+    /**
      * Authenticate based on user and password (which is md5') for app
-     * Returns 409 if user has logged in on a different device with the same name 
+     * Returns 409 if user has logged in on a different device with the same name
      * within a specied period (see error message for details)
      *
      * @param email - The email of the user
@@ -636,7 +636,7 @@
         }
     };
 
-    /** 
+    /**
      * Gets a user based on the Profile User Id
      *
      * @param uuid - The profile User Id
@@ -652,7 +652,7 @@
         })
     };
 
-    /** 
+    /**
      * Creates a user object on the Zzish User Database. Email and password is at least required.
      *
      * @param email - The email of the user
@@ -674,7 +674,7 @@
         })
     };
 
-    /** 
+    /**
      * Update user object on the Zzish User Database
      *
      * @param user - The user object
@@ -689,9 +689,9 @@
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
         })
-    };    
+    };
 
-    /** 
+    /**
      * Update the user password
      *
      * @param uuid - The user uuid
@@ -713,29 +713,22 @@
 
     /**
      * Save a Zzish content object
-     * @param profileId - The id of the profile to which to save the content for     
+     * @param profileId - The id of the profile to which to save the content for
      * @param type - The content type
+     * @param uuid - Unique id of the content
+     * @param meta - A Json Object of tags associated with the object. Special tags are name, categoryId and code.
      * @param content - The JSON object to save
      * @param callback - An optional callback to call when done (returns error,message)
      */
-    Zzish.postContent = function (profileId, type, content, callback) {
+    Zzish.postContent = function (profileId, type, uuid,meta, content, callback) {
         var data = {
+            uuid: uuid,
+            meta: meta,
             payload: JSON.stringify(content)
         };
-        if (content.uuid==undefined) {
-            content.uuid = uuid.v4();
-        }
-        data.uuid = content.uuid;
-        if (content.name==undefined) {
-            content.name = "Undefined content" +uuid.v4();            
-        }
-        data.name = content.name;
-        if (content.categoryId!=undefined) {
-            data.categoryId = content.categoryId;
-        }
         var request = {
             method: "POST",
-            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + type + "/" + data.uuid,
+            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + type + "/" + uuid,
             data: data
         };
         sendData(request, function (err, data) {
@@ -745,7 +738,7 @@
 
     /**
      * Delete a Zzish content object
-     * @param profileId - The id of the profile to which to save the content for     
+     * @param profileId - The id of the profile to which to save the content for
      * @param type - The content type
      * @param id - The id of the content
      * @param callback - An optional callback to call when done (returns error,message)
@@ -760,11 +753,22 @@
         });
     };
 
+    var formatContentObject = function(content) {
+        var result = {
+            uuid: content.uuid,
+            meta : content.meta
+        };
+        if (content.payload!==undefined && content.payload!="") {
+            result.payload = JSON.parse(content.payload);
+        }
+        return result;
+    }
+
     /**
      * Get a Zzish content object
      * @param profileId - The id of the profile to which to get the content for
      * @param type - The content type
-     * @param uuid - THe uuid to get 
+     * @param uuid - THe uuid to get
      * @param callback - A callback to call when done (returns error AND (message or data))
      */
     Zzish.getContent = function (profileId, type, uuid, callback) {
@@ -775,13 +779,12 @@
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
                 if (!err) {
-                    if (data.payload!==undefined && data.payload.payload!==undefined && data.payload.payload!="") {
-                        var item = JSON.parse(data.payload.payload);    
-                        callback(err,item);
+                    if (data.payload!==undefined && data.payload!=null) {
+                        callback(err,formatContentObject(data.payload));
                     }
                     else {
                         callback("Invalid Data");
-                    }                    
+                    }
                 }
                 else {
                     callback(status, message);
@@ -790,42 +793,35 @@
         });
     };
 
-    /**
-     * Get a Zzish content object by code
-     * @param type - The content type
-     * @param code - The content code
-     * @param callback - A callback to call when done (returns error AND (message or data))
-     */
-    Zzish.getContentByCode = function (type,code, callback) {
-        var request = {
-            method: "GET",
-            url: getBaseUrl() + "profiles/publicconsumers/code/" + code
-        };
-        sendData(request, function (err, data) {
-            callCallBack(err, data, function (status, message) {
-                if (!err) {
-                    callback(err,JSON.parse(data.payload));
+    function convertToParameters() {
+        var str = "";
+        for (var key in obj) {
+            if (str != "") {
+                str += "&";
+            }
+            if (Array.isArray(obj[key])) {
+                for (var i in obj[key]) {
+                    str += key + "=" + encodeURIComponent(obj[key][i]);
                 }
-                else {
-                    callback(status, message);
-                }
-            });
-        });
-    };
+            }
+            else {
+                str += key + "=" + encodeURIComponent(obj[key]);
+            }
+        }
+        return str;
+    }
 
     /**
-     * Get a Zzish content objects
+     * Search a list of Zzish content object
      * @param profileId - The id of the profile to which to get the content for
      * @param type - The content type
-     * @param uuids - An array of uuid
+     * @param meta - A list of parameters to search on meta part
      * @param callback - A callback to call when done (returns error AND (message or data))
      */
-    Zzish.getContents = function (profileId, type,uuids, callback) {
-        var input = { uuids: uuids };
+    Zzish.searchContent = function (profileId, type, meta, callback) {
         var request = {
-            method: "POST",
-            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + type + "/list",
-            data: input
+            method: "GET",
+            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + type + "/search?" + convertToParameters(meta)
         };
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
@@ -907,26 +903,6 @@
         });
     };
 
-
-    //process content objects for lists/register
-    function processContent(message) {
-        var list = [];
-        if (message.contents!=undefined) {
-            for (var i=0;i<message.contents.length;i++) {
-                var item = JSON.parse(message.contents[i].payload);
-                if (item !== null) {
-                    if (item.categoryId==undefined && message.contents[i].categoryId!=undefined) {
-                        item.categoryId = message.contents[i].categoryId;    
-                    }                
-                    list.push(item);
-                }
-            }                            
-        }
-        message.contents = list;
-        message.categories = message.categories;
-        delete message.payload;        
-    } 
-
     /**
      * Return a list of contents and categories for a particular class code
      *
@@ -941,19 +917,7 @@
             url: getBaseUrl() + "profiles/" + profileId + "/consumers/"+code,
         };
         sendData(request, function (err, data) {
-            callCallBack(err, data, function (status, message) {
-                if (!err) {
-                    if(!data.payload){
-                        callback(404, null);
-                    }else{
-                        processContent(message);
-                        callback(err, message);
-                    }
-                }
-                else {
-                    callback(status, message);
-                }
-            });
+            callCallBack(err, data, callback);
         })
     };
 
@@ -972,19 +936,7 @@
             data: {}
         };
         sendData(request, function (err, data) {
-            callCallBack(err, data, function (status, message) {
-                if (!err) {
-                    if(!data.payload){
-                        callback(404, null);
-                    }else{
-                        processContent(message);
-                        callback(err, message);
-                    }
-                }
-                else {
-                    callback(status, message);
-                }
-            });
+            callCallBack(err, data, callback);
         })
     };
 
@@ -993,7 +945,7 @@
      * Get results for Zzish content object
      * @param profileId - The id of the profile to which to get the content for
      * @param type - The content type
-     * @param uuid - THe uuid to get 
+     * @param uuid - THe uuid to get
      * @param callback - A callback to call when done (returns error AND (message or data))
      */
     Zzish.getContentResults = function (profileId, type, uuid, callback) {
@@ -1006,11 +958,10 @@
         });
     };
 
-
     /**
      * Get results for Zzish public content object
      * @param type - The content type
-     * @param uuid - THe uuid to get 
+     * @param uuid - THe uuid to get
      * @param callback - A callback to call when done (returns error AND (message or data))
      */
     Zzish.getPublicContentResults = function (type, uuid, callback) {
@@ -1037,13 +988,7 @@
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
                 if (!err) {
-                    var item = JSON.parse(data.payload.payload);
-                    if (item !== null) {
-                        if (item.categoryId==undefined && data.payload.categoryId!=undefined) {
-                            item.categoryId=data.payload.categoryId;
-                        }
-                    }
-                    callback(err, item);
+                    callback(err,formatContentObject(data.payload));
                 }
                 else {
                     callback(status, message);
@@ -1063,29 +1008,13 @@
             url: getBaseUrl() + "profiles/publicconsumers/" + type
         };
         sendData(request, function (err, data) {
-            callCallBack(err, data, function (status, message) {
-                if (!err) {
-                    var list = [];
-                    var resultList = data.payload;
-                    if (data){
-                        for (var i in resultList.contents) {
-                            var json = JSON.parse(resultList.contents[i].payload);
-                            list.push(json);
-                        }
-                        resultList.contents = list;
-                    }
-                    callback(err, resultList);
-                }
-                else {
-                    callback(status, message);
-                }
-            });
+            callCallBack(err, data, callback);
         });
-    };    
+    };
 
     /**
      * Save a Zzish category object
-     * @param profileId - The id of the profile to which to save the category for     
+     * @param profileId - The id of the profile to which to save the category for
      * @param category - The category object
      * @param callback - An optional callback to call when done (returns error,message)
      */
@@ -1102,7 +1031,7 @@
 
     /**
      * Delete a Zzish category object
-     * @param profileId - The id of the profile to which to save the category for     
+     * @param profileId - The id of the profile to which to save the category for
      * @param id - The id of the category
      * @param callback - An optional callback to call when done (returns error,message)
      */
@@ -1129,7 +1058,7 @@
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
         });
-    };      
+    };
 
 /**** USER STUFF ***/
 
@@ -1140,10 +1069,10 @@
         for (var i in params) {
             url = url + "&"+i + "=" + params[i];
         }
-        if (type=="pop") {                    
+        if (type=="pop") {
             var win = window.open(url, 'Zzish Login', 'width=800, height=600');
             var pollTimer = window.setInterval(
-                function() { 
+                function() {
                   try {
                     if (win.document.URL.indexOf(webUrl) === -1) {
                       window.clearInterval(pollTimer);
@@ -1152,11 +1081,11 @@
                     }
                   } catch(e) {
                   }
-                }, 500);                    
+                }, 500);
         }
         else {
-            window.location.href = url; 
-        }        
+            window.location.href = url;
+        }
     }
 
     /**
@@ -1170,11 +1099,15 @@
         if (stateful()) {
             //check if we already have a token
             token = localStorage.getItem("token");
+            if (token=="Zzish Error" || token=="undefined") {
+                localStorage.removeItem("token");
+                token = null;
+            }
         }
         if (options==undefined) {
             options = {};
         }
-        if (token==undefined) {
+        if (token==undefined || token==null) {
             var token_request = {
                 method: "POST",
                 url: getBaseUrl() + "profiles/tokens",
@@ -1209,15 +1142,15 @@
             }
             //create a token first
             sendData(token_request, function (err, data) {
-                callCallBack(err, data, function(err,data) {                
+                callCallBack(err, data, function(err,data) {
                     data.token = token;
-                    callback(err,data);             
+                    callback(err,data);
                 });
-            });    
-        } 
+            });
+        }
         else {
             callback();
-        }   
+        }
     }
 
     /**
@@ -1245,7 +1178,7 @@
         XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
     }
 
-    
+
     var req;
     var ocallback;
 
