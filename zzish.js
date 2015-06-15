@@ -754,12 +754,12 @@
         });
     };
 
-    var formatContentObject = function(content,includePayload) {
+    var formatContentObject = function(content,notInclude) {
         var result = {
             uuid: content.uuid,
             meta : content.meta
         };
-        if (!!includePayload && content.payload!==undefined && content.payload!="") {
+        if (notInclude && content.payload!==undefined && content.payload!="") {
             result.payload = JSON.parse(content.payload);
         }
         return result;
@@ -803,7 +803,7 @@
             callCallBack(err, data, function (status, message) {
                 if (!err) {
                     if (data.payload!==undefined && data.payload!=null) {
-                        callback(err,formatContentObject(data.payload,true));
+                        callback(err,formatContentObject(data.payload));
                     }
                     else {
                         callback("Invalid Data");
@@ -824,15 +824,38 @@
             }
             if (Array.isArray(obj[key])) {
                 for (var i in obj[key]) {
-                    str += key + "=" + encodeURIComponent(obj[key][i]);
+                    str += key + "=" + encodeURIComponent(JSON.stringify((obj[key][i]));
                 }
             }
             else {
-                str += key + "=" + encodeURIComponent(obj[key]);
+                str += key + "=" + encodeURIComponent(JSON.stringify(obj[key]));
             }
         }
         return str;
     }
+
+    /**
+     * Search all content objects
+     * @param type - The content type
+     * @param meta - A list of parameters to search on meta part
+     * @param callback - A callback to call when done (returns error AND (message or data))
+     */
+    Zzish.searchPublicContent = function (type, meta, callback) {
+        var request = {
+            method: "GET",
+            url: getBaseUrl() + "profiles/publicconsumers/" + type + "/search?" + convertToParameters(meta)
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, function (status, message) {
+                if (!err) {
+                    callback(err, formatListContents(data));
+                }
+                else {
+                    callback(status, message);
+                }
+            });
+        });
+    };
 
     /**
      * Search a list of Zzish content object
@@ -1023,7 +1046,7 @@
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
                 if (!err) {
-                    callback(err,formatContentObject(data.payload,true));
+                    callback(err,formatContentObject(data.payload));
                 }
                 else {
                     callback(status, message);
