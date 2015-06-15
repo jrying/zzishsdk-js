@@ -803,7 +803,7 @@
             callCallBack(err, data, function (status, message) {
                 if (!err) {
                     if (data.payload!==undefined && data.payload!=null) {
-                        callback(err,formatContentObject(data.payload),true);
+                        callback(err,formatContentObject(data.payload,true));
                     }
                     else {
                         callback("Invalid Data");
@@ -1046,7 +1046,7 @@
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
                 if (!err) {
-                    callback(err,formatContentObject(data.payload),true);
+                    callback(err,formatContentObject(data.payload,true));
                 }
                 else {
                     callback(status, message);
