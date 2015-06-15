@@ -824,11 +824,11 @@
             }
             if (Array.isArray(obj[key])) {
                 for (var i in obj[key]) {
-                    str += key + "=" + encodeURIComponent(JSON.stringify((obj[key][i]);
+                    str += key + "=" + encodeURIComponent(JSON.stringify(obj[key][i]));
                 }
             }
             else {
-                str += key + "=" + encodeURIComponent(JSON.stringify(obj[key]);
+                str += key + "=" + encodeURIComponent(JSON.stringify(obj[key]));
             }
         }
         return str;
