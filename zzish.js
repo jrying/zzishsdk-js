@@ -754,12 +754,12 @@
         });
     };
 
-    var formatContentObject = function(content,notInclude) {
+    var formatContentObject = function(content,includePayload) {
         var result = {
             uuid: content.uuid,
             meta : content.meta
         };
-        if (notInclude && content.payload!==undefined && content.payload!="") {
+        if (!!includePayload && content.payload!==undefined && content.payload!="") {
             result.payload = JSON.parse(content.payload);
         }
         return result;
@@ -803,7 +803,7 @@
             callCallBack(err, data, function (status, message) {
                 if (!err) {
                     if (data.payload!==undefined && data.payload!=null) {
-                        callback(err,formatContentObject(data.payload));
+                        callback(err,formatContentObject(data.payload,true));
                     }
                     else {
                         callback("Invalid Data");
@@ -1023,7 +1023,7 @@
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
                 if (!err) {
-                    callback(err,formatContentObject(data.payload));
+                    callback(err,formatContentObject(data.payload,true));
                 }
                 else {
                     callback(status, message);
