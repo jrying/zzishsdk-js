@@ -36,6 +36,7 @@
             var url = window.location.href;
             if (url!=undefined) {
                 var arr = url.split("/");
+                if (arr[0]=="file:") arr[0] = "http:";
                 return arr[0] + "//" + baseUrl;
             }
         }
@@ -753,15 +754,37 @@
         });
     };
 
-    var formatContentObject = function(content) {
+    var formatContentObject = function(content,notInclude) {
         var result = {
             uuid: content.uuid,
             meta : content.meta
         };
-        if (content.payload!==undefined && content.payload!="") {
+        if (notInclude && content.payload!==undefined && content.payload!="") {
             result.payload = JSON.parse(content.payload);
         }
         return result;
+    }
+
+    var formatListContents = function(data) {
+        var list = [];
+        if (data){
+            for (var i in data.payload) {
+                list.push(formatContentObject(data.payload[i],false));
+            }
+        };
+        return list;
+    }
+
+    var formatListCategoryContents = function(data) {
+        if (data && data.payload.contents){
+            var list = [];
+            for (var i in data.payload.contents) {
+                var result = formatContentObject(data.payload.contents[i],false);
+                list.push(result);
+            }
+            data.payload.contents = list;
+        };
+        return data.payload;
     }
 
     /**
@@ -801,15 +824,38 @@
             }
             if (Array.isArray(obj[key])) {
                 for (var i in obj[key]) {
-                    str += key + "=" + encodeURIComponent(obj[key][i]);
+                    str += key + "=" + encodeURIComponent(JSON.stringify((obj[key][i]));
                 }
             }
             else {
-                str += key + "=" + encodeURIComponent(obj[key]);
+                str += key + "=" + encodeURIComponent(JSON.stringify(obj[key]));
             }
         }
         return str;
     }
+
+    /**
+     * Search all content objects
+     * @param type - The content type
+     * @param meta - A list of parameters to search on meta part
+     * @param callback - A callback to call when done (returns error AND (message or data))
+     */
+    Zzish.searchPublicContent = function (type, meta, callback) {
+        var request = {
+            method: "GET",
+            url: getBaseUrl() + "profiles/publicconsumers/" + type + "/search?" + convertToParameters(meta)
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, function (status, message) {
+                if (!err) {
+                    callback(err, formatListContents(data));
+                }
+                else {
+                    callback(status, message);
+                }
+            });
+        });
+    };
 
     /**
      * Search a list of Zzish content object
@@ -824,7 +870,14 @@
             url: getBaseUrl() + "profiles/" + profileId + "/contents/" + type + "/search?" + convertToParameters(meta)
         };
         sendData(request, function (err, data) {
-            callCallBack(err, data, callback);
+            callCallBack(err, data, function (status, message) {
+                if (!err) {
+                    callback(err, formatListContents(data));
+                }
+                else {
+                    callback(status, message);
+                }
+            });
         });
     };
 
@@ -842,16 +895,7 @@
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
                 if (!err) {
-                    var list = [];
-                    if (data){
-                        for (var i in data.payload) {
-                            if (data.payload[i].payload) {
-                                delete data.payload[i]['payload'];
-                            }
-                            list.push(data.payload[i]);
-                        }
-                    }
-                    callback(err, list);
+                    callback(err, formatListContents(data));
                 }
                 else {
                     callback(status, message);
@@ -917,7 +961,14 @@
             url: getBaseUrl() + "profiles/" + profileId + "/consumers/"+code,
         };
         sendData(request, function (err, data) {
-            callCallBack(err, data, callback);
+            callCallBack(err, data, function (status, message) {
+                if (!err) {
+                    callback(err, formatListCategoryContents(data));
+                }
+                else {
+                    callback(status, message);
+                }
+            });
         })
     };
 
@@ -936,7 +987,14 @@
             data: {}
         };
         sendData(request, function (err, data) {
-            callCallBack(err, data, callback);
+            callCallBack(err, data, function (status, message) {
+                if (!err) {
+                    callback(err, formatListCategoryContents(data));
+                }
+                else {
+                    callback(status, message);
+                }
+            });
         })
     };
 
@@ -1008,7 +1066,14 @@
             url: getBaseUrl() + "profiles/publicconsumers/" + type
         };
         sendData(request, function (err, data) {
-            callCallBack(err, data, callback);
+            callCallBack(err, data, function (status, message) {
+                if (!err) {
+                    callback(err, formatListCategoryContents(data));
+                }
+                else {
+                    callback(status, message);
+                }
+            });
         });
     };
 
