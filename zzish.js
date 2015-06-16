@@ -816,7 +816,7 @@
         });
     };
 
-    function convertToParameters() {
+    function convertToParameters(obj) {
         var str = "";
         for (var key in obj) {
             if (str != "") {
