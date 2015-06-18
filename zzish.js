@@ -185,7 +185,7 @@
     Zzish.getUsers = function (ids, callback) {
         var request = {
             method: "GET",
-            url: getBaseUrl() + "profiles/list/" + ids.join(",")
+            url: getBaseUrl() + "profiles/list/" + encodeURIComponent(ids.join(";"))
         };
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
@@ -862,7 +862,7 @@
     Zzish.getContents = function (profileId, type, uuids, callback) {
         var request = {
             method: "GET",
-            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + type + "/list/" + uuids.join(";")
+            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + type + "/list/" + encodeURIComponent(uuids.join(";"))
         };
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
