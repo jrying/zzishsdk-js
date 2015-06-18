@@ -176,6 +176,23 @@
     };
 
     /**
+     * Get a list of users
+     *
+     * @param ids - A unique Id for the user (required)
+     * @param callback - An optional callback after user has been saved on server
+     * @return The user (returns a server user if it already exists). If it's the current User, returns that user
+     */
+    Zzish.getUsers = function (ids, callback) {
+        var request = {
+            method: "GET",
+            url: getBaseUrl() + "profiles/list/" + ids.join(",")
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, callback);
+        })
+    };
+
+    /**
      * Save the User (if the id is the same as the current one, returns the current user)
      *
      * @param id - A unique Id for the user (required)
@@ -188,6 +205,25 @@
             method: "POST",
             url: getBaseUrl() + "profiles",
             data: user
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, callback);
+        })
+    };
+
+    /**
+     * Create a Zzish group for a user
+     *
+     * @param id - A unique Id for the user (required)
+     * @param group - The group object to save
+     * @param callback - An optional callback after user has been saved on server
+     * @return The group (returns a server user if it already exists). If it's the current User, returns that user
+     */
+    Zzish.saveGroup = function (id, group, callback) {
+        var request = {
+            method: "POST",
+            url: getBaseUrl() + "profiles/" + id  + "/groups",
+            data: group
         };
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
@@ -765,11 +801,11 @@
         return result;
     }
 
-    var formatListContents = function(data) {
+    var formatListContents = function(data,includePayload) {
         var list = [];
         if (data){
             for (var i in data.payload) {
-                list.push(formatContentObject(data.payload[i],false));
+                list.push(formatContentObject(data.payload[i],includePayload));
             }
         };
         return list;
@@ -816,6 +852,36 @@
         });
     };
 
+    /**
+     * Get a Zzish content object
+     * @param profileId - The id of the profile to which to get the content for
+     * @param type - The content type
+     * @param uuids - An array of uuids
+     * @param callback - A callback to call when done (returns error AND (message or data))
+     */
+    Zzish.getContents = function (profileId, type, uuids, callback) {
+        var request = {
+            method: "GET",
+            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + type + "/list/" + uuids.join(";")
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, function (status, message) {
+                if (!err) {
+                    if (data.payload!==undefined && data.payload!=null) {
+                        callback(err, formatListContents(data,true));
+                    }
+                    else {
+                        callback("Invalid Data");
+                    }
+                }
+                else {
+                    callback(status, message);
+                }
+            });
+        });
+    };
+
+
     function convertToParameters(obj) {
         var str = "";
         for (var key in obj) {
@@ -848,7 +914,7 @@
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
                 if (!err) {
-                    callback(err, formatListContents(data));
+                    callback(err, formatListContents(data,false));
                 }
                 else {
                     callback(status, message);
@@ -872,7 +938,7 @@
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
                 if (!err) {
-                    callback(err, formatListContents(data));
+                    callback(err, formatListContents(data,false));
                 }
                 else {
                     callback(status, message);
@@ -895,7 +961,7 @@
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
                 if (!err) {
-                    callback(err, formatListContents(data));
+                    callback(err, formatListContents(data,false));
                 }
                 else {
                     callback(status, message);
