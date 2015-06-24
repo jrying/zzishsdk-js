@@ -176,6 +176,23 @@
     };
 
     /**
+     * Get the User by the zzish user code
+     *
+     * @param code - Their zzish user code
+     * @param callback - An optional callback after user has been saved on server
+     * @return The user (returns a server user if it already exists). If it's the current User, returns that user
+     */
+    Zzish.getUserByCode = function (code, callback) {
+        var request = {
+            method: "GET",
+            url: getBaseUrl() + "profiles/code/" + code
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, callback);
+        })
+    };
+
+    /**
      * Get a list of users
      *
      * @param ids - A unique Id for the user (required)
