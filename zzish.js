@@ -247,6 +247,48 @@
         })
     };
 
+
+    /**
+     * Create a game
+     *
+     * @param userId - The userId of the user (required)
+     * @param game - The game Object (required)
+     * @param callback - A callback to be called after message is sent (returns error,message)
+     * @return The game uuid
+     */
+    Zzish.createGame = function (userId, game, callback) {
+        if (game.uuid === undefined) {
+            game.uuid = v4();
+        }
+        game.profileId = userId;
+        var request = {
+            method: "POST",
+            url: getBaseUrl() + "statements/games",
+            data: game
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, callback);
+        })
+        return game.uuid;
+    };
+
+    /**
+     * Get results of a game
+     *
+     * @param gameId - The Game uuid
+     * @param callback - A callback to be called after message is sent (returns error,message)
+     * @return The game uuid
+     */
+    Zzish.getGameActivities = function (gameId, callback) {
+        var request = {
+            method: "GET",
+            url: getBaseUrl() + "statements/games/" + gameId + "/activities"
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, callback);
+        })
+    };
+
     /**
      * Start Activity with name
      *
@@ -622,13 +664,13 @@
     /**
      * Get List of Groups for user
      *
-     * @param id - A unique Id for the user (required)
+     * @param profileId - A unique Id for the user (required)
      * @param callback - An optional callback after user has been saved on server
      */
-    Zzish.listGroups = function (id, callback) {
+    Zzish.listGroups = function (profileId, callback) {
         var request = {
             method: "GET",
-            url: getBaseUrl() + "profiles/"+id+"/groups",
+            url: getBaseUrl() + "profiles/"+profileId+"/groups"
         };
         sendData(request, function (err, data) {
             if (!err) {
@@ -641,6 +683,24 @@
             callCallBack(err, data, callback);
         })
     };
+
+    /**
+     * Get List of Students for Group
+     *
+     * @param profileId - The owner of the group
+     * @param groupId - The uuid of the group
+     * @param callback - An optional callback after user has been saved on server
+     */
+    Zzish.listStudents = function (profileId, groupId, callback) {
+        var request = {
+            method: "GET",
+            url: getBaseUrl() + "profiles/"+profileId+"/groups/"+groupId+"/students"
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, callback);
+        })
+    };
+
 
     /**
      * Get List of Content assigned to all groups of the profile
@@ -1081,6 +1141,20 @@
         })
     };
 
+    /**
+     * Get results for Zzish content object
+     * @param uuid - THe uuid to get
+     * @param callback - A callback to call when done (returns error AND (message or data))
+     */
+    Zzish.getUserResults = function (profileId, callback, parameters) {
+        var request = {
+            method: "GET",
+            url: getBaseUrl() + "statements/" + profileId + "/results?" + convertToParameters(parameters)
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, callback);
+        });
+    };
 
     /**
      * Get results for Zzish content object
@@ -1212,11 +1286,7 @@
 
 
     function loadLoginWithToken(type,params,callback) {
-        var url = webUrl + 'account/applogin?1=1';
-        delete params['redirectURL'];
-        for (var i in params) {
-            url = url + "&"+i + "=" + params[i];
-        }
+        var url = webUrl + 'account/applogin?token='+params.token;
         if (type=="pop") {
             var win = window.open(url, 'Zzish Login', 'width=800, height=600');
             var pollTimer = window.setInterval(
