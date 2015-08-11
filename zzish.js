@@ -435,6 +435,15 @@
         if (parameters.definition==undefined) {
             parameters.definition = {};
         }
+        var action = createActionObject(parameters);
+        sendMessage({
+            verb: "http://activitystrea.ms/schema/1.0/start",
+            activityUuid: activityId,
+            actions: [action]
+        }, parameters, callback);
+    }
+
+    function createActionObject(parameters) {
         var action = parameters.result;
         if (action==undefined) {
             action = {};
@@ -460,10 +469,17 @@
                 }
             }
         }
+        return action;
+    }
+
+    Zzish.logActions = function (activity, parameters, actionObjects, callback) {
+        var actions = actionObjects.map(function(action) {
+            return createActionObject(action);
+        });
         sendMessage({
             verb: "http://activitystrea.ms/schema/1.0/start",
             activityUuid: activityId,
-            actions: [action]
+            actions: actions
         }, parameters, callback);
     }
 
@@ -476,7 +492,7 @@
      */
     var sendMessage = function (data, parameters, callback) {
         if (currentUser) {
-            data.userUuid = currentUser.uuid;
+        data.userUuid = currentUser.uuid;
         }
         if (parameters.extensions==undefined) {
             parameters.extensions = {};
@@ -888,15 +904,15 @@
 
     var formatContentObject = function(content,includePayload) {
         if (content) {
-            var result = {
-                uuid: content.uuid,
-                meta : content.meta
-            };
-            if (includePayload && content.payload!==undefined && content.payload!="") {
-                result.payload = JSON.parse(content.payload);
-            }
-            return result;
+        var result = {
+            uuid: content.uuid,
+            meta : content.meta
+        };
+        if (includePayload && content.payload!==undefined && content.payload!="") {
+            result.payload = JSON.parse(content.payload);
         }
+        return result;
+    }
         return null;
     }
 
