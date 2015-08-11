@@ -17,7 +17,7 @@
 
     <script src="zzish.js"></script>
     <script>
-        var activityId; 
+        var activityId;
         var init = false;
         //set to true to use a stateless version of the SDK
         var stateless = false;
@@ -42,7 +42,7 @@
                 if ($("#appId").val()!="") {
                     var initParams = $("#appId").val();
                     Zzish.init(initParams);
-                    init = true;    
+                    init = true;
                     console.log("App Initalized with id",$("#appId").val());
                 }
                 else {
@@ -61,11 +61,11 @@
                 }
                 command.getUser($("#userId").val(),$("#name").val(),function(err,message) {
                     if (!err) {
-                        console.log("User " + message.uuid + "created");        
+                        console.log("User " + message.uuid + "created");
                     }
                     else {
                         console.log("Error starting" + err)
-                    }                        
+                    }
                 });
             }
             else {
@@ -74,8 +74,8 @@
         }
 
         function startActivity() {
-            if (initApp()) { 
-                var validRequest = true; 
+            if (initApp()) {
+                var validRequest = true;
                 if ($("#groupCode").val()!="") {
                     if (Zzish.validateClassCode($("#groupCode").val())) {
                         validRequest = true;
@@ -86,11 +86,11 @@
                 }
                 else {
                     validRequest = true;
-                }   
+                }
                 if (validRequest) {
                     activityId = Zzish.startActivity($("#userId").val(),$("#aname").val(),$("#groupCode").val(),function(err,message) {
                         if (!err) {
-                            console.log("Activity " + message.uuid + "started");        
+                            console.log("Activity " + message.uuid + "started");
                         }
                         else {
                             console.log("Error starting" + err)
@@ -104,19 +104,29 @@
             else {
                 alert ("Please init with your APP_ID from http://www.zzish.co.uk/developer/")
             }
-            
+
         }
 
         function logAction() {
-            if (initApp()) {                        
-                Zzish.logAction(activityId,$("#actname").val(),$("#response").val(),$("#Score").val(),$("#correct").val(),$("#Duration").val(),$("#Attempts").val(),$("#attributes").val(),function(err,message) {
+            if (initApp()) {
+                var definition = {
+                    type: $("#actname").val()
+                };
+                var result = {};
+                result["uuid"] = $("#actuuid").val();
+                result["response"] = $("#response").val();
+                result["score"] = parseFloat($("#Score").val());
+                result["correct"] = $("#correct").val();
+                result["duration"] = parseInt($("#Duration").val());
+                result["attempts"] = parseInt($("#Attempts").val());
+                Zzish.logActionWithObjects(activityId,{definition:definition, result: result},function(err,message) {
                     if (!err) {
-                        console.log("logAction " + message.uuid + "started");        
+                        console.log("logAction " + message.uuid + "started");
                     }
                     else {
                         console.log("Error starting" + err)
                     }
-                });            
+                });
             }
             else {
                 alert ("Please init with your APP_ID from http://www.zzish.co.uk/developer/")
@@ -124,36 +134,36 @@
         }
 
         function stopActivity() {
-            if (initApp()) {             
+            if (initApp()) {
                 Zzish.stopActivity(activityId,$("#aattributes").val(),function(err,message) {
                     if (!err) {
-                        console.log("Activity " + message.uuid + "started");        
+                        console.log("Activity " + message.uuid + "started");
                     }
                     else {
                         console.log("Error starting" + err)
                     }
-                });            
+                });
             }
             else {
                 alert ("Please init with your APP_ID from http://www.zzish.co.uk/developer/")
             }
-        }   
+        }
 
         function cancelActivity() {
-            if (initApp()) {                        
+            if (initApp()) {
                 Zzish.cancelActivity(activityId,function(err,message) {
                     if (!err) {
-                        console.log("Activity " + message.uuid + "cancelled");        
+                        console.log("Activity " + message.uuid + "cancelled");
                     }
                     else {
                         console.log("Error starting" + err)
                     }
-                });            
+                });
             }
             else {
                 alert ("Please init with your APP_ID from http://www.zzish.co.uk/developer/")
             }
-        }        
+        }
     </script>
 </head>
 
@@ -175,6 +185,8 @@
 <span class="help">This is the name of the activity. (e.g. "Level 1", "Multiple Choice Quiz", "French")<br/></span>
 <input type="button" onclick="startActivity()" value="Start Activity" id="startActivityButton"/><br/>
 <h1>Create Action</h1>
+<input type="text" id="actuuid" name="actuuid" placeholder="Action UUID" value=""/><br/>
+<span class="help">This is the unique code to identify a question. (e.g. "Q1" or "What is 3*3)". This must be unique across your app.<br/></span>
 <input type="text" id="actname" name="actname" placeholder="Action Name" value=""/><br/>
 <span class="help">This is the unique code to identify a question. (e.g. "Q1" or "What is 3*3)". This must be unique across your app.<br/></span>
 <input type="text" id="response" name="response" placeholder="Response" value=""/><br/>
