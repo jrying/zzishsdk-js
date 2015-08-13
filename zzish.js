@@ -1243,7 +1243,12 @@
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
                 if (!err) {
-                    callback(err,formatContentObject(data.payload,true));
+                    if (data) {
+                        callback(err,formatContentObject(data.payload,true));
+                    }
+                    else {
+                        callback(status, message);
+                    }
                 }
                 else {
                     callback(status, message);
