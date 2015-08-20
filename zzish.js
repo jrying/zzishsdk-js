@@ -802,6 +802,23 @@
     };
 
     /**
+     * Searchs a user by Attributes
+     *
+     * @param attributes - A set of attributes to search for on user. String key/value pairs
+     * @param callback - An optional callback after user has been saved on server
+     */
+    Zzish.userByAttributes = function (attributes, callback) {
+        var request = {
+            method: "POST",
+            url: getBaseUrl() + "profiles/authenticate/search",
+            data: attributes
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, callback);
+        })
+    };
+
+    /**
      * Creates a user object on the Zzish User Database. Email and password is at least required.
      *
      * @param email - The email of the user
