@@ -25,7 +25,7 @@
 
     var defaultProtocol = "https://";
     var baseUrl = "api.zzish.com/";
-    var webUrl = "https://www.zzish.com/"
+    var webUrl = "https://www.zzish.com/";
     var logEnabled = false;
     var header = "Authorization";
     var headerprefix = "Bearer ";
@@ -873,6 +873,55 @@
         sendData(request, function (err, data) {
             callCallBack(err, data, callback);
         })
+    };
+
+    /**
+     * Authorizes user to log in straight from the developer's app by authorizing the user. An email will be sent
+     *
+     * @param userId - The Developer User Id
+     * @param email - The email of the user
+     * @param name - The optional name fo the user
+     * @param callback - An optional callback after user has been saved on server
+     */
+    Zzish.registerUserWithZzish = function (userId, email, name, callback) {
+        var message = {
+            email: email,
+            profile: {
+                uuid: userId,
+                name: name
+            }
+        };
+        var request = {
+            method: "POST",
+            url: getBaseUrl() + "profiles/authenticate/eregister",
+            data: message
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, callback);
+        });
+    };
+
+    /**
+     * Returns a token to be used for accessing Zzish website
+     *
+     * @param userId - The Developer User Id
+     * @param callback - An optional callback after user has been saved on server
+     */
+    Zzish.getTokenForUser = function (userId, callback) {
+        var message = {
+            uuid: userId
+        };
+        var request = {
+            method: "POST",
+            url: getBaseUrl() + "profiles/authenticate/token",
+            data: message
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, function(err, message) {
+                var url = webUrl + "account/app/" + message + "/token";
+                callback(err, url);
+            });
+        });
     };
 
     /**** BACKEND CONTENT STUFF ***/

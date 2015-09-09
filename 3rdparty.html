@@ -1,0 +1,82 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+    <title>Zzish Quick Javascript Client SDK</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+
+    <script src="zzish.js"></script>
+    <script>
+        var init = false;
+        var loggedIn = false;
+        var token;
+        var href;
+
+        function initApp() {
+            if (init) return true;
+            if ($("#appId").val()!="") {
+                var initParams = $("#appId").val();
+                Zzish.init(initParams);
+                init = true;
+                console.log("App Initalized with id",$("#appId").val());
+                return true;
+            }
+            else {
+                alert ("Please enter your API KEY from http://www.zzish.co.uk/developer/")
+                return false;
+            }
+        }
+
+        function registerWithZzish() {
+            var uuid = $("#uuid").val();
+            var email = $("#email").val();
+            var name = $("#name").val();
+
+            if (initApp()) {
+                Zzish.registerUserWithZzish(uuid, email, name, function(err, message) {
+                    console.log("Result from register", err, message);
+                });
+            }
+        }
+
+        function loadUser() {
+            if (initApp()) {
+                var uuid = $("#uuid").val();
+                var redirect = $("#redirect").val();
+                Zzish.getTokenForUser(uuid, function(err, url) {
+                    href = url;
+                    console.log("Result from register", err, url);
+                    $("#dashboard").attr("href",url + "/" + redirect);
+                });
+            }
+        }
+
+        function updateTarget() {
+            $("#dashboard").attr("href",href + "/" + $("#redirect").val());
+        }
+    </script>
+</head>
+
+<body>
+<input type="text" id="appId" name="appId" placeholder="Your API Key" value="" size="40"/><br/>
+<h1>Login</h1>
+<div id="loginButtons">
+<input type="text" id="uuid" name="uuid" placeholder="UUID (Required)"/><br/>
+<input type="text" id="email" name="email" placeholder="Email (Required)"/><br/>
+<input type="text" id="name" name="name" placeholder="Name (Optional)"/><br/><br/>
+<input type="button" onclick="registerWithZzish()" value="RegisterWithZzish"/><br/><br/>
+<input type="button" onclick="loadUser()" value="LoadUser"/><br/><br/>
+<select id="redirect" onchange="updateTarget()">
+    <option value="">Nothing defaults to home</option>
+    <option value="home">Home</option>
+    <option value="dashboard">Teacher Dashboard</option>
+</select>
+<a id="dashboard" target=_blank>Open Dashboard</a>
+<br/><br/>
+</div>
+</body>
+</html>
