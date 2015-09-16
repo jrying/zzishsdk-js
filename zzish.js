@@ -970,17 +970,18 @@
 
     var formatContentObject = function(content,includePayload) {
         if (content) {
-        var result = {
-            uuid: content.uuid,
-            meta : content.meta
-        };
-        if (includePayload && content.payload!==undefined && content.payload!="") {
-            result.payload = JSON.parse(content.payload);
+            var result = {
+                uuid: content.uuid,
+                meta : content.meta,
+                attributes: content.attributes
+            };
+            if (includePayload && content.payload!==undefined && content.payload!="") {
+                result.payload = JSON.parse(content.payload);
+            }
+            return result;
         }
-        return result;
-    }
         return null;
-    }
+    };
 
     var formatListContents = function(data,includePayload) {
         var list = [];
@@ -988,9 +989,9 @@
             for (var i in data.payload) {
                 list.push(formatContentObject(data.payload[i],includePayload));
             }
-        };
+        }
         return list;
-    }
+    };
 
     var formatListCategoryContents = function(data) {
         if (data && data.payload.contents){
@@ -1000,9 +1001,9 @@
                 list.push(result);
             }
             data.payload.contents = list;
-        };
+        }
         return data.payload;
-    }
+    };
 
     /**
      * Get a Zzish content object
