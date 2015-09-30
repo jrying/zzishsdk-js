@@ -48,9 +48,14 @@
                 var uuid = $("#uuid").val();
                 var redirect = $("#redirect").val();
                 Zzish.getTokenForUser(uuid, function(err, url) {
-                    href = url;
-                    console.log("Result from register", err, url);
-                    $("#dashboard").attr("href",url + "/" + redirect);
+                    if (err == 400) {
+                        alert("Either the user doesn't exist or the user has not authorized this email")
+                    }
+                    else {
+                        href = url;
+                        console.log("Result from register", err, url);
+                        $("#dashboard").attr("href",url + "/" + redirect);
+                    }
                 });
             }
         }
