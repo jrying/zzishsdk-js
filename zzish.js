@@ -1251,7 +1251,22 @@
     /**
      * Get results for Zzish content object
      * @param uuid - THe uuid to get
+     * @param parameters - Optional parameters to modify result
+     *		limit: The nubmer of activity records (max 10) to return per request (default: 10)
+            skip: Used for pagination (default: 0)
+            iprofile: Include profile information (default: 0)
+            idetails: Include individual actions for each activity instance (default: false)
+            aggregate: Aggregate Results per activity definition (default: false)
+            data: Return individual activity instance records. Works with limit and skip variables (default: false)
      * @param callback - A callback to call when done (returns error AND (message or data))
+     *        Result object
+                    data - An array of activity instance records (if data = true)
+                    aggregate - An array of stats per activity (if aggregate = true)
+                    meta - The meta descriptions for the data and aggregate fields
+                        - data_total - The total number of activity instance records
+                        - agg_total - The total number of aggregate records
+                    query - A Summary of query parameters passed in (as the request)
+
      */
     Zzish.getUserResults = function (profileId, callback, parameters) {
         var request = {
