@@ -526,7 +526,7 @@
         return action;
     }
 
-    Zzish.logActions = function (activity, parameters, actionObjects, callback) {
+    Zzish.logActions = function (activityId, parameters, actionObjects, callback) {
         var actions = actionObjects.map(function(action) {
             return createActionObject(action);
         });
