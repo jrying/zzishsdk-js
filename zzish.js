@@ -526,7 +526,7 @@
         return action;
     }
 
-    Zzish.logActions = function (activityId, parameters, actionObjects, callback) {
+    Zzish.logActions = function (activity, parameters, actionObjects, callback) {
         var actions = actionObjects.map(function(action) {
             return createActionObject(action);
         });
@@ -1518,40 +1518,29 @@
      * @param callback - A callback to call when done (returns error AND (message or user))
      */
     Zzish.login = function (type,options,callback) {
-        token = getDataValue("token");
-        if (token=="Zzish error" || token=="undefined") {
-            removeDataValue("token");
-            token = null;
-        }
-        if (options==undefined) {
-            options = {};
-        }
-        if (token==undefined || token==null) {
-            var token_request = {
-                method: "POST",
-                url: getBaseUrl() + "profiles/tokens",
-                data: { options: options }
-            }
-            //create a token first
-            sendData(token_request, function (err, data) {
-                    callCallBack(err, data, function(err,token) {
-                    options['token']=token;
-                    setDataValue("token", token);
-                    loadLoginWithToken(type,options,callback);
-                });
+        var token_request = {
+            method: "POST",
+            url: getBaseUrl() + "profiles/tokens",
+            data: { options: options }
+        };
+        //create a token first
+        sendData(token_request, function (err, data) {
+                callCallBack(err, data, function(err,token) {
+                options['token']=token;
+                setDataValue("token", token);
+                loadLoginWithToken(type,options,callback);
             });
-        }
-        else {
-            loadLoginWithToken(type,token,callback);
-        }
-    }
+        });
+    };
 
     Zzish.getCurrentUser = function(token,callback) {
         if (token==undefined) {
             //see if we can get token from query params
             token = getQueryParams()["token"];
         }
-        token = getDataValue("token");
+        if (token==undefined) {
+            token = getDataValue("token");
+        }
         if (token !== undefined && token!="Zzish error" && token!="undefined") {
             var token_request = {
                 method: "GET",
