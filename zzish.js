@@ -1075,7 +1075,7 @@
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
                 if (!err) {
-                    if (data.payload!==undefined && data.payload!=null) {
+                    if (data && data.payload!==undefined && data.payload!=null) {
                         callback(err,formatContentObject(data.payload,true));
                     }
                     else {
@@ -1550,7 +1550,9 @@
             //create a token first
             sendData(token_request, function (err, data) {
                 callCallBack(err, data, function(err,data) {
-                    data.token = token;
+                    if (data) {
+                        data.token = token;
+                    }                    
                     callback(err,data);
                 });
             });
