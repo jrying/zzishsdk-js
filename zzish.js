@@ -762,7 +762,7 @@
             url: getBaseUrl() + "profiles/"+profileId+"/groups"
         };
         sendData(request, function (err, data) {
-            if (!err) {
+            if (!err && data && data.payload) {
                 for (var i in data.payload) {
                     var link = replaceAll("/","-----",data.payload[i].link);
                     link = replaceAll("\\\\","=====",link)
@@ -770,7 +770,7 @@
                 }
             }
             callCallBack(err, data, callback);
-        })
+        });
     };
 
     /**
