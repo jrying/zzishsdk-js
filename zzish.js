@@ -499,29 +499,16 @@
 
     function createActionObject(parameters) {
         var action = parameters.result;
-        if (action==undefined) {
+        if (action == undefined) {
             action = {};
         }
         action.definition = parameters.definition;
-        if (parameters.attributes != undefined && parameters.attributes != "") {
-            action.state = {};
-            if (parameters.attributes["proficiency"]!=undefined) {
-                proficiency = parameters.attributes["proficiency"];
-                delete parameters.attributes["proficiency"];
-                action.state["proficiency"]=proficiency;
-            }
-            var found = false;
-            for (i in parameters.attributes) {
-                found = true;
-            }
-            if (found) {
-                if (typeof(parameters.attributes) == 'string') {
-                    action.state["attributes"] = JSON.parse(parameters.attributes);
-                }
-                else {
-                    action.state["attributes"] = parameters.attributes;
-                }
-            }
+        action.state = parameters.state;
+        if (typeof parameters.attributes === "string") {
+            action.attributes = JSON.parse(parameters.attributes);
+        }
+        else {
+            action.attributes = parameters.attributes;
         }
         return action;
     }
@@ -535,7 +522,7 @@
             activityUuid: activityId,
             actions: actions
         }, parameters, callback);
-    }
+    };
 
     /**
      * send message to REST API
@@ -604,7 +591,7 @@
                 message.context.extensions["http://www.zzish.com/context/extension/"+i] = parameters.extensions[i];
             }
         }
-        if (data.actions!=undefined) {
+        if (data.actions !== undefined) {
             message.actions = data.actions;
         }
         return message;
