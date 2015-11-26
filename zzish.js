@@ -26,7 +26,7 @@
 /**** CONFIGURATION ******/
 
     var defaultProtocol = "https://";
-    var baseUrl = "api.zzish.com/";
+    var baseUrl = "francesco.zzish.com/";
     var webUrl = "https://www.zzish.com/";
     var logEnabled = false;
     var header = "Authorization";
@@ -499,34 +499,21 @@
 
     function createActionObject(parameters) {
         var action = parameters.result;
-        if (action==undefined) {
+        if (action == undefined) {
             action = {};
         }
         action.definition = parameters.definition;
-        if (parameters.attributes != undefined && parameters.attributes != "") {
-            action.state = {};
-            if (parameters.attributes["proficiency"]!=undefined) {
-                proficiency = parameters.attributes["proficiency"];
-                delete parameters.attributes["proficiency"];
-                action.state["proficiency"]=proficiency;
-            }
-            var found = false;
-            for (i in parameters.attributes) {
-                found = true;
-            }
-            if (found) {
-                if (typeof(parameters.attributes) == 'string') {
-                    action.state["attributes"] = JSON.parse(parameters.attributes);
-                }
-                else {
-                    action.state["attributes"] = parameters.attributes;
-                }
-            }
+        action.state = parameters.state;
+        if (typeof parameters.attributes === "string") {
+            action.attributes = JSON.parse(parameters.attributes);
+        }
+        else {
+            action.attributes = parameters.attributes;
         }
         return action;
     }
 
-    Zzish.logActions = function (activity, parameters, actionObjects, callback) {
+    Zzish.logActions = function (activityId, parameters, actionObjects, callback) {
         var actions = actionObjects.map(function(action) {
             return createActionObject(action);
         });
@@ -535,7 +522,7 @@
             activityUuid: activityId,
             actions: actions
         }, parameters, callback);
-    }
+    };
 
     /**
      * send message to REST API
@@ -604,7 +591,7 @@
                 message.context.extensions["http://www.zzish.com/context/extension/"+i] = parameters.extensions[i];
             }
         }
-        if (data.actions!=undefined) {
+        if (data.actions !== undefined) {
             message.actions = data.actions;
         }
         return message;
@@ -762,7 +749,7 @@
             url: getBaseUrl() + "profiles/"+profileId+"/groups"
         };
         sendData(request, function (err, data) {
-            if (!err) {
+            if (!err && data && data.payload) {
                 for (var i in data.payload) {
                     var link = replaceAll("/","-----",data.payload[i].link);
                     link = replaceAll("\\\\","=====",link)
@@ -770,7 +757,7 @@
                 }
             }
             callCallBack(err, data, callback);
-        })
+        });
     };
 
     /**
@@ -1055,8 +1042,9 @@
                 list.push(result);
             }
             data.payload.contents = list;
+            return data.payload;
         }
-        return data.payload;
+        return data;
     };
 
     /**
@@ -1074,7 +1062,7 @@
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
                 if (!err) {
-                    if (data.payload!==undefined && data.payload!=null) {
+                    if (data && data.payload!==undefined && data.payload!=null) {
                         callback(err,formatContentObject(data.payload,true));
                     }
                     else {
@@ -1105,7 +1093,7 @@
         sendData(request, function (err, data) {
             callCallBack(err, data, function (status, message) {
                 if (!err) {
-                    if (data.payload!==undefined && data.payload!=null) {
+                    if (data && data.payload!==undefined && data.payload!=null) {
                         callback(err, formatListContents(data,true));
                     }
                     else {
@@ -1549,7 +1537,9 @@
             //create a token first
             sendData(token_request, function (err, data) {
                 callCallBack(err, data, function(err,data) {
-                    data.token = token;
+                    if (data) {
+                        data.token = token;
+                    }
                     callback(err,data);
                 });
             });
