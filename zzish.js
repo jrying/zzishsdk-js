@@ -26,7 +26,7 @@
 /**** CONFIGURATION ******/
 
     var defaultProtocol = "https://";
-    var baseUrl = "francesco.zzish.com/";
+    var baseUrl = "francesco.zzish.com/api/";
     var webUrl = "https://www.zzish.com/";
     var logEnabled = false;
     var header = "Authorization";
