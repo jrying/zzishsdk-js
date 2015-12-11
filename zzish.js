@@ -361,13 +361,21 @@
     };
 
     /**
+     * Generate an activityId
+     *
+     * @return A unique id for the activityId
+     */
+    Zzish.generateActivityId = function () {
+        return v4();
+    };
+
+    /**
      * Start Activity with name
      *
      * @param userId - The userId of the user (required)
      * @param activityName - The name of the activity (required)
      * @param code - The Zzish Class Code when creating a class in the learning hub (optional)
      * @param callback - A callback to be called after message is sent (returns error,message)
-     * @return The activity zzish
      */
     Zzish.startActivity = function (userId, activityName, code, callback) {
         var parameters = {
@@ -377,8 +385,8 @@
             extensions: {
                 groupCode: code
             }
-        }
-        return Zzish.startActivityWithObjects(userId,parameters, callback);
+        };
+        Zzish.startActivityWithObjects(userId,parameters, callback);
     };
 
     /**
@@ -387,21 +395,18 @@
      * @param userId - The userId of the user (required)
      * @param parameters - The parameters Object which contains various configurations of the activity
      * @param callback - A callback to be called after message is sent (returns error,message)
-     * @return The activity zzish
      */
     Zzish.startActivityWithObjects = function (userId, parameters, callback) {
         if (!currentUser || !stateful() || userId!=currentUser.id) {
             currentUser = {
                 uuid: userId
-            }
-        };
-        aid = v4();
+            };
+        }
         var message = {
             verb: "http://activitystrea.ms/schema/1.0/start",
-            activityUuid: aid
+            activityUuid: parameters.activityId || v4()
         };
-        sendMessage(message, parameters,callback);
-        return aid;
+        sendMessage(message, parameters, callback);
     };
 
     /**
@@ -503,6 +508,7 @@
             action = {};
         }
         action.definition = parameters.definition;
+        action.uuid = parameters.uuid || v4();
         action.state = parameters.state;
         if (typeof parameters.attributes === "string") {
             action.attributes = JSON.parse(parameters.attributes);
@@ -585,6 +591,9 @@
         };
         if (parameters.states!=undefined) {
             message.object.state = parameters.states;
+        }
+        if (parameters.stored !== undefined) {
+            message.stored = parameters.stored;
         }
         if (parameters.extensions) {
             for (i in parameters.extensions) {
