@@ -595,6 +595,9 @@
         if (parameters.stored !== undefined) {
             message.stored = parameters.stored;
         }
+        if (parameters.timestamp !== undefined) {
+            message.timestamp = parameters.timestamp;
+        }
         if (parameters.extensions) {
             for (i in parameters.extensions) {
                 message.context.extensions["http://www.zzish.com/context/extension/"+i] = parameters.extensions[i];

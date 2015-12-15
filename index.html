@@ -88,9 +88,20 @@
                     validRequest = true;
                 }
                 if (validRequest) {
-                    activityId = Zzish.startActivity($("#userId").val(),$("#aname").val(),$("#groupCode").val(),function(err,message) {
+                    var parameters = {
+                        activityDefinition: {
+                            type: $("#aname").val()
+                        },
+                        extensions: {
+                            groupCode: $("#groupCode").val()
+                        }
+                    };
+                    if ($("#stored").val().length > 0) {
+                        parameters.stored = $("#stored").val();
+                    }
+                    Zzish.startActivityWithObjects($("#userId").val(),parameters,function(err,message) {
                         if (!err) {
-                            console.log("Activity " + message.uuid + "started");
+                            console.log("Activity " + message.id + "started");
                         }
                         else {
                             console.log("Error starting" + err)
@@ -219,6 +230,8 @@
 <h1>Start Activity</h1>
 <input type="text" id="groupCode" name="groupCode" placeholder="Class code" value=""/><br/>
 <span class="help">This is the class code you get when you create a class in the learning hub (http://www.zzish.com/learning-hub) It uniquely identifies the class. <br/></span>
+<input type="text" id="stored" name="stored" placeholder="Activity Start Time" value=""/><br/>
+<span class="help">This is a long format of when the activity was started<br/></span>
 <input type="text" id="aname" name="aname" placeholder="Activity Name" value=""/><br/>
 <span class="help">This is the name of the activity. (e.g. "Level 1", "Multiple Choice Quiz", "French")<br/></span>
 <input type="button" onclick="startActivity()" value="Start Activity" id="startActivityButton"/><br/>
