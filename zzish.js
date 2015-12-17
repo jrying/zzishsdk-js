@@ -1088,6 +1088,35 @@
         });
     };
 
+    /**
+     * Get the Zzish assignment
+     * @param profileId - The id of the profile to which to get the content for
+     * @param type - The content type
+     * @param uuid - THe uuid of the student assignement
+     * @param callback - A callback to call when done (returns error AND (message or data))
+     */
+    Zzish.getAssignment = function (profileId, type, uuid, callback) {
+        var request = {
+            method: "GET",
+            url: getBaseUrl() + "profiles/" + profileId + "/contents/" + type + "/assignments/" + uuid
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, function (status, message) {
+                if (!err) {
+                    if (data && data.payload!==undefined && data.payload!=null) {
+                        callback(err,formatContentObject(data.payload,true));
+                    }
+                    else {
+                        callback("Invalid Data");
+                    }
+                }
+                else {
+                    callback(status, message);
+                }
+            });
+        });
+    };
+
 
 
     /**
