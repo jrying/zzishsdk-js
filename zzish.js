@@ -1363,6 +1363,34 @@
         });
     };
 
+
+    /*
+     * Get practice content
+     * @param uuid - THe profileId of the user
+     * @param parameters - Optional parameters to modify result
+     *      questionsToReturn: 10 (default)
+     * @param callback - A callback to call when done (returns error AND (message or data))
+     *        Result object
+                    actions - A list of actions to practice
+                    aggregate -
+                    meta - The meta descriptions for the data and aggregate fields
+                        - data_total - The total number of activity instance records
+                        - agg_total - The total number of aggregate records
+                    query - A Summary of query parameters passed in (as the request)
+
+     */
+    Zzish.loadPracticeQuiz = function (profileId, parameters, callback) {
+        var request = {
+            method: "GET",
+            url: getBaseUrl() + "profiles/" + profileId + "/consumers/practice?" + convertToParameters(parameters)
+        };
+        sendData(request, function (err, data) {
+            callCallBack(err, data, callback);
+        });
+    };
+
+
+
     /**
      * Get results for Zzish content object
      * @param profileId - The id of the profile to which to get the content for
