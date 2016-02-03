@@ -620,7 +620,9 @@
      * @return The result after the replace is done
      */
     function replaceAll(find, replace, str) {
-        return str.replace(new RegExp(find, 'g'), replace);
+        if (str){
+            return str.replace(new RegExp(find, 'g'), replace);
+        }
     }
 
     /**
@@ -1335,7 +1337,7 @@
      * Get results for Zzish content object
      * @param uuid - THe uuid to get
      * @param parameters - Optional parameters to modify result
-     *		limit: The nubmer of activity records (max 10) to return per request (default: 10)
+     *      limit: The nubmer of activity records (max 10) to return per request (default: 10)
             skip: Used for pagination (default: 0)
             iprofile: Include profile information (default: 0)
             idetails: Include individual actions for each activity instance (default: false)
