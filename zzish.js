@@ -1027,6 +1027,7 @@
         if (content) {
             var result = {
                 uuid: content.uuid,
+                type: content.type,
                 meta : content.meta,
                 attributes: content.attributes
             };
