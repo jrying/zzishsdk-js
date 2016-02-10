@@ -1571,6 +1571,37 @@
     }
 
     /**
+     * Create a Token
+     * @param type - "pop" (default) will do a popup. "redirect" will go to zzish and then come back
+     * @param options - a list of optinos for token
+     * @param callback - A callback to call when done (returns error AND (message or user))
+     */
+    Zzish.createToken = function (type,options,callback) {
+        var token_request = {
+            method: "POST",
+            url: getBaseUrl() + "profiles/tokens",
+            data: { options: options }
+        };
+        //create a token first
+        sendData(token_request, callback);
+    };
+
+    /**
+     * Get a Token
+     * @param uuid - The token uuid
+     * @param callback - A callback to call when done (returns error AND (message or user))
+     */
+    Zzish.getToken = function (uuid,callback) {
+        var token_request = {
+            method: "GET",
+            url: getBaseUrl() + "profiles/tokens/" + uuid
+        }
+        //create a token first
+        sendData(token_request, callback);
+    };
+
+
+    /**
      * Login to Zzish
      * @param type - "pop" (default) will do a popup. "redirect" will go to zzish and then come back
      * @param options - a list of optinos for login
