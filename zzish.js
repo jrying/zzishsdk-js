@@ -26,9 +26,8 @@
 /**** CONFIGURATION ******/
 
     var defaultProtocol = "https://";
-    // var baseUrl = "francesco.zzish.com/api/";
-    var baseUrl = "localhost:8080/zzishapi/api/";
-    var webUrl = "https://www.zzish.com/";
+    var baseUrl = "zapi.zzish.com/";
+    var webUrl = "https://hub.zzish.com/";
     var logEnabled = false;
     var header = "Authorization";
     var headerprefix = "Bearer ";
