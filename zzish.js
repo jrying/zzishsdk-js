@@ -26,7 +26,8 @@
 /**** CONFIGURATION ******/
 
     var defaultProtocol = "https://";
-    var baseUrl = "francesco.zzish.com/api/";
+    // var baseUrl = "francesco.zzish.com/api/";
+    var baseUrl = "localhost:8080/zzishapi/api/";
     var webUrl = "https://www.zzish.com/";
     var logEnabled = false;
     var header = "Authorization";
@@ -98,12 +99,12 @@
 
     function getBaseUrl() {
         if (stateful() && window !== undefined && window.location !== undefined && window.location.href !== undefined) {
-            var url = window.location.href;
-            if (url!=undefined) {
-                var arr = url.split("/");
-                if (arr[0]=="file:") arr[0] = "http:";
-                return arr[0] + "//" + baseUrl;
-            }
+            // var url = window.location.href;
+            // if (url!=undefined) {
+            //     var arr = url.split("/");
+            //     if (arr[0]=="file:") arr[0] = "http:";
+            //     return arr[0] + "//" + baseUrl;
+            // }
         }
         return defaultProtocol + baseUrl;
     }
