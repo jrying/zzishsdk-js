@@ -1050,7 +1050,7 @@
     };
 
     var formatListCategoryContents = function(data) {
-        if (data && data.payload.contents){
+        if (data && data.payload && data.payload.contents){
             var list = [];
             for (var i in data.payload.contents) {
                 var result = formatContentObject(data.payload.contents[i],false);
